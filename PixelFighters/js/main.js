@@ -31,7 +31,7 @@ let attackDelay = 500; // Delay in milliseconds
 
 function preload() {
     // Load assets for the game
-    this.load.image('background', 'assets/sprites/background.png');
+    this.load.image('background', 'assets/sprites/background.jpg');
     this.load.spritesheet('player1', 'assets/sprites/player1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('player2', 'assets/sprites/player2.png', { frameWidth: 32, frameHeight: 32 });
     this.load.image('ground', 'assets/sprites/ground.png');
