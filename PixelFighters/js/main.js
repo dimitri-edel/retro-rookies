@@ -23,7 +23,8 @@ const game = new Phaser.Game(config);
 let player1, player2;
 let cursors, keys;
 let player1Health = 100, player2Health = 100;
-let player1HealthText, player2HealthText;
+let player1Mana = 100, player2Mana = 100;
+let player1HealthText, player2HealthText, player1ManaText, player2ManaText;
 let gameOver = false;
 let lastPlayer1AttackTime = 0, lastPlayer2AttackTime = 0;
 let attackDelay = 500; // Delay in milliseconds
@@ -43,9 +44,11 @@ function create() {
     const ground = this.physics.add.staticGroup();
     ground.create(128, 230, 'ground').setScale(1).refreshBody();
 
-    // Initialize health text for both players
-    player1HealthText = createHealthText(this, 10, 10, 'Health: ' + player1Health);
-    player2HealthText = createHealthText(this, 160, 10, 'Health: ' + player2Health);
+    // Initialize health and mana text for both players
+    player1HealthText = createText(this, 10, 10, 'Health: ' + player1Health);
+    player2HealthText = createText(this, 160, 10, 'Health: ' + player2Health);
+    player1ManaText = createText(this, 10, 30, 'Mana: ' + player1Mana);
+    player2ManaText = createText(this, 160, 30, 'Mana: ' + player2Mana);
 
     // Create player sprites with physics
     player1 = this.physics.add.sprite(50, 200, 'player1');
@@ -62,90 +65,161 @@ function create() {
 
     // Set up control inputs
     cursors = this.input.keyboard.createCursorKeys();
-    keys = this.input.keyboard.addKeys('W,A,S,D,SPACE');
+    keys = this.input.keyboard.addKeys('W,A,S,D,SPACE,ONE');
+
+    // Set up mana regeneration loop every 5 seconds
+    this.time.addEvent({
+        delay: 5000,
+        callback: rechargeMana,
+        callbackScope: this,
+        loop: true
+    });
 }
 
 function update() {
     if (gameOver) return;
 
     // Validate players before trying to update their positions
-    if (player1 && player1.active) {
-        player1.setVelocityX(0);
-
-        // Handle movement for player 1 (WASD keys)
-        if (keys.A.isDown) {
-            player1.setVelocityX(-100);
-        } else if (keys.D.isDown) {
-            player1.setVelocityX(100);
-        }
-        if (keys.W.isDown && player1.body.blocked.down) {
-            player1.setVelocityY(-300);
-        }
-
-        // Ensure player 1 stays within the screen bounds and is visible
-        ensureSpriteVisibility(player1);
-    }
-
-    if (player2 && player2.active) {
-        player2.setVelocityX(0);
-
-        // Handle movement for player 2 (Arrow keys)
-        if (cursors.left.isDown) {
-            player2.setVelocityX(-100);
-        } else if (cursors.right.isDown) {
-            player2.setVelocityX(100);
-        }
-        if (cursors.up.isDown && player2.body.blocked.down) {
-            player2.setVelocityY(-300);
-        }
-
-        // Ensure player 2 stays within the screen bounds and is visible
-        ensureSpriteVisibility(player2);
-    }
+    handlePlayerMovement(player1, keys.A, keys.D, keys.W);
+    handlePlayerMovement(player2, cursors.left, cursors.right, cursors.up);
 
     // Manage attacks for both players
-    manageAttacks.call(this); 
+    manageAttacks.call(this);
+}
+
+// Function to handle player movement
+function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
+    if (player && player.active) {
+        player.setVelocityX(0);
+
+        if (leftKey.isDown) {
+            player.setVelocityX(-100);
+        } else if (rightKey.isDown) {
+            player.setVelocityX(100);
+        }
+        if (jumpKey.isDown && player.body.blocked.down) {
+            player.setVelocityY(-300);
+        }
+
+        // Ensure player stays within the screen bounds and is visible
+        ensureSpriteVisibility(player);
+    }
 }
 
 function manageAttacks() {
-    // Player 1 attack (SPACE key)
+    // Regular attack for Player 1 (SPACE key)
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 attacking");
-        activateHitbox.call(this, player1, player2);
+        console.log("Player 1 pressed 'SPACE' for regular attack!");
+        if (player1Mana >= 20) {
+            player1Mana -= 20;
+            updateManaText(player1ManaText, player1Mana);
+            console.log("Player 1 activating regular attack!");
+            activateHitbox.call(this, player1, player2, 10);
+        } else {
+            console.log("Player 1 doesn't have enough mana for regular attack!");
+        }
     }
 
-    // Player 2 attack (Down arrow key)
+    // Regular attack for Player 2 (Down arrow key)
     if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
-        console.log("Player 2 attacking");
-        activateHitbox.call(this, player2, player1);
+        console.log("Player 2 pressed 'DOWN' for regular attack!");
+        if (player2Mana >= 20) {
+            player2Mana -= 20;
+            updateManaText(player2ManaText, player2Mana);
+            console.log("Player 2 activating regular attack!");
+            activateHitbox.call(this, player2, player1, 10);
+        } else {
+            console.log("Player 2 doesn't have enough mana for regular attack!");
+        }
+    }
+
+    // Super punch attack for Player 1 (S key)
+    if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
+        lastPlayer1AttackTime = this.time.now;
+        console.log("Player 1 pressed 'S' for super punch!");
+        if (player1Mana >= 50) {
+            player1Mana -= 50;
+            updateManaText(player1ManaText, player1Mana);
+            console.log("Player 1 activating super punch!");
+            activateSuperPunch.call(this, player1, player2);
+        } else {
+            console.log("Player 1 doesn't have enough mana for super punch!");
+        }
+    }
+
+    // Super punch attack for Player 2 (1 key)
+    if (Phaser.Input.Keyboard.JustDown(keys.ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+        lastPlayer2AttackTime = this.time.now;
+        console.log("Player 2 pressed '1' for super punch!");
+        if (player2Mana >= 50) {
+            player2Mana -= 50;
+            updateManaText(player2ManaText, player2Mana);
+            console.log("Player 2 activating super punch!");
+            activateSuperPunch.call(this, player2, player1);
+        } else {
+            console.log("Player 2 doesn't have enough mana for super punch!");
+        }
     }
 }
 
-// Activate a new hitbox for a player when they attack
-function activateHitbox(attacker, target) {
-    // Validate player before creating a hitbox
+// Function to activate hitbox for regular and super punch attacks
+function activateHitbox(attacker, target, damage) {
     if (!attacker || !attacker.active) return;
 
-    // Create a new hitbox for the attack
     const hitbox = this.physics.add.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null).setSize(40, 40).setVisible(false).setActive(true);
-
     console.log(`Activating hitbox for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
 
-    // Set up overlap detection for the new hitbox
     this.physics.add.overlap(hitbox, target, () => {
-        handlePlayerHit(attacker, target, hitbox);
+        handlePlayerHit(attacker, target, hitbox, damage);
     }, null, this);
 
-    // Deactivate and destroy the hitbox after a short delay to ensure it only registers one hit
     this.time.delayedCall(100, () => {
-        console.log(`Deactivating hitbox for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
-        deactivateHitbox(hitbox); // Only deactivate the hitbox, not the player
+        deactivateHitbox(hitbox);
     }, [], this);
 }
 
-// Deactivate and destroy the hitbox to clean up after an attack
+function activateSuperPunch(attacker, target) {
+    console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
+    activateHitbox.call(this, attacker, target, 25);
+
+    // Push the target to the edge of the screen
+    if (target.active) {
+        const direction = attacker.x < target.x ? 1 : -1;
+        target.setVelocityX(300 * direction);
+        target.setVelocityY(-150);
+        console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and flying towards the edge of the screen!`);
+    }
+}
+
+function handlePlayerHit(attacker, target, hitbox, damage) {
+    if (hitbox.active && target.active && !target.body.immovable) {
+        if (target === player1) {
+            player1Health -= damage;
+            console.log(`Player 1 hit! Health reduced by ${damage}. Current Health: ${player1Health}`);
+            updateHealthText(player1HealthText, player1Health);
+        } else if (target === player2) {
+            player2Health -= damage;
+            console.log(`Player 2 hit! Health reduced by ${damage}. Current Health: ${player2Health}`);
+            updateHealthText(player2HealthText, player2Health);
+        }
+
+        // Deactivate the hitbox after a successful hit
+        deactivateHitbox(hitbox);
+
+        // Restart the target character to ensure they remain visible and active
+        restartCharacter(target);
+
+        // Check if the target's health has reached 0 and end the game if so
+        if (player1Health <= 0) {
+            endGame('Player 2');
+        } else if (player2Health <= 0) {
+            endGame('Player 1');
+        }
+    }
+}
+
 function deactivateHitbox(hitbox) {
     if (hitbox && hitbox.active) {
         hitbox.setVisible(false).setActive(false);
@@ -154,27 +228,7 @@ function deactivateHitbox(hitbox) {
     }
 }
 
-// Handle when a player is hit by the other player
-function handlePlayerHit(attacker, target, hitbox) {
-    if (hitbox.active && target.active) {
-        if (target === player1) {
-            player1Health -= 10;
-            console.log("Player 1 hit!");
-            updateHealthText(player1HealthText, player1Health);
-        } else if (target === player2) {
-            player2Health -= 10;
-            console.log("Player 2 hit!");
-            updateHealthText(player2HealthText, player2Health);
-        }
-
-        deactivateHitbox(hitbox); // Deactivate the hitbox on successful hit
-
-        // Restart the target to ensure they remain visible and active
-        restartCharacter(target);
-    }
-}
-
-// Ensure sprite stays within bounds and is visible
+// Function to ensure sprite stays within bounds and is visible
 function ensureSpriteVisibility(player) {
     if (player.x < 0 || player.x > config.width || player.y < 0 || player.y > config.height) {
         console.warn(`${player === player1 ? 'Player 1' : 'Player 2'} out of bounds, resetting position.`);
@@ -198,15 +252,48 @@ function restartCharacter(player) {
     player.setVisible(true);
     player.setActive(true);
     player.body.enable = true; // Re-enable physics
+
+    console.log(`${player === player1 ? 'Player 1' : 'Player 2'} has been reset and is active again.`);
 }
 
-// Create a health text display for each player
-function createHealthText(scene, x, y, text) {
+// Create a text display for health and mana
+function createText(scene, x, y, text) {
     return scene.add.text(x, y, text, { fontFamily: 'Arial', fontSize: '16px', fill: 'black' });
 }
 
-// Update the health text display when a player is hit
+// Update the health text display when a player's health changes
 function updateHealthText(healthText, health) {
     healthText.setText('Health: ' + health);
-    console.log(`Updated Health: Player1: ${player1Health}, Player2: ${player2Health}`);
+    console.log(`Health updated: ${healthText.text}`);
+}
+
+// Update the mana text display when a player's mana changes
+function updateManaText(manaText, mana) {
+    manaText.setText('Mana: ' + mana);
+    console.log(`Mana updated: ${manaText.text}`);
+}
+
+// Recharge mana for both players every 5 seconds
+function rechargeMana() {
+    if (player1Mana < 100) {
+        player1Mana = Math.min(player1Mana + 20, 100);
+        updateManaText(player1ManaText, player1Mana);
+        console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
+    }
+    if (player2Mana < 100) {
+        player2Mana = Math.min(player2Mana + 20, 100);
+        updateManaText(player2ManaText, player2Mana);
+        console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
+    }
+}
+
+// End the game and declare a winner
+function endGame(winner) {
+    console.log(`${winner} wins!`);
+    gameOver = true;
+    player1.setActive(false).setVisible(false);
+    player2.setActive(false).setVisible(false);
+
+    // Display a victory message
+    createText(this.scene, 80, 120, `${winner} Wins!`);
 }
