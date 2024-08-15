@@ -112,41 +112,35 @@ function manageAttacks() {
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
         console.log("Player 1 attacking");
-        activateHitbox.call(this, player1);
+        activateHitbox.call(this, player1, player2);
     }
 
     // Player 2 attack (Down arrow key)
     if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
         console.log("Player 2 attacking");
-        activateHitbox.call(this, player2);
+        activateHitbox.call(this, player2, player1);
     }
 }
 
 // Activate a new hitbox for a player when they attack
-function activateHitbox(player) {
+function activateHitbox(attacker, target) {
     // Validate player before creating a hitbox
-    if (!player || !player.active) return;
+    if (!attacker || !attacker.active) return;
 
     // Create a new hitbox for the attack
-    const hitbox = this.physics.add.sprite(player.x + (player.flipX ? -20 : 20), player.y, null).setSize(40, 40).setVisible(false).setActive(true);
+    const hitbox = this.physics.add.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null).setSize(40, 40).setVisible(false).setActive(true);
 
-    console.log(`Activating hitbox for ${player === player1 ? 'Player 1' : 'Player 2'}`);
+    console.log(`Activating hitbox for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
 
     // Set up overlap detection for the new hitbox
-    if (player === player1) {
-        this.physics.add.overlap(hitbox, player2, (hitbox, target) => {
-            handlePlayerHit(player2, hitbox);
-        }, null, this);
-    } else {
-        this.physics.add.overlap(hitbox, player1, (hitbox, target) => {
-            handlePlayerHit(player1, hitbox);
-        }, null, this);
-    }
+    this.physics.add.overlap(hitbox, target, () => {
+        handlePlayerHit(attacker, target, hitbox);
+    }, null, this);
 
     // Deactivate and destroy the hitbox after a short delay to ensure it only registers one hit
     this.time.delayedCall(100, () => {
-        console.log(`Deactivating hitbox for ${player === player1 ? 'Player 1' : 'Player 2'}`);
+        console.log(`Deactivating hitbox for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
         deactivateHitbox(hitbox); // Only deactivate the hitbox, not the player
     }, [], this);
 }
@@ -161,13 +155,13 @@ function deactivateHitbox(hitbox) {
 }
 
 // Handle when a player is hit by the other player
-function handlePlayerHit(player, hitbox) {
-    if (hitbox.active && player.active) {
-        if (player === player1) {
+function handlePlayerHit(attacker, target, hitbox) {
+    if (hitbox.active && target.active) {
+        if (target === player1) {
             player1Health -= 10;
             console.log("Player 1 hit!");
             updateHealthText(player1HealthText, player1Health);
-        } else {
+        } else if (target === player2) {
             player2Health -= 10;
             console.log("Player 2 hit!");
             updateHealthText(player2HealthText, player2Health);
@@ -175,8 +169,8 @@ function handlePlayerHit(player, hitbox) {
 
         deactivateHitbox(hitbox); // Deactivate the hitbox on successful hit
 
-        // Restart the player to ensure they remain visible and active
-        restartCharacter(player);
+        // Restart the target to ensure they remain visible and active
+        restartCharacter(target);
     }
 }
 
