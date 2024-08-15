@@ -7,8 +7,8 @@ const config = {
     physics: {
         default: 'arcade',
         arcade: {
-            gravity: { y: 300 },
-            debug: true // Enable debug mode
+            gravity: { y: 600 },
+            debug: false
         }
     },
     scene: {
@@ -28,6 +28,7 @@ let player1HealthText, player2HealthText, player1ManaText, player2ManaText;
 let gameOver = false;
 let lastPlayer1AttackTime = 0, lastPlayer2AttackTime = 0;
 let attackDelay = 500; // Delay in milliseconds
+let bgMusic; // Variable to hold the background music
 
 function preload() {
     // Load assets for the game
@@ -35,6 +36,7 @@ function preload() {
     this.load.spritesheet('player1', 'assets/sprites/player1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('player2', 'assets/sprites/player2.png', { frameWidth: 32, frameHeight: 32 });
     this.load.image('ground', 'assets/sprites/ground.png');
+    this.load.audio('bgMusic', 'assets/music/background.mp3'); // Load the background music
 }
 
 function create() {
@@ -74,6 +76,11 @@ function create() {
         callbackScope: this,
         loop: true
     });
+
+    // Add and play background music
+    bgMusic = this.sound.add('bgMusic'); // Add the background music to the scene
+    bgMusic.setLoop(true); // Set the music to loop
+    bgMusic.play(); // Play the background music
 }
 
 function update() {
@@ -85,6 +92,9 @@ function update() {
 
     // Manage attacks for both players
     manageAttacks.call(this);
+
+    // Check if either player has died
+    checkForDeath();
 }
 
 // Function to handle player movement
@@ -93,15 +103,16 @@ function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
         player.setVelocityX(0);
 
         if (leftKey.isDown) {
-            player.setVelocityX(-100);
+            player.setVelocityX(-120); // Slightly increased speed
         } else if (rightKey.isDown) {
-            player.setVelocityX(100);
+            player.setVelocityX(120);
         }
+
+        // Make the jump height relative to how long the jump button is held down
         if (jumpKey.isDown && player.body.blocked.down) {
             player.setVelocityY(-300);
         }
 
-        // Ensure player stays within the screen bounds and is visible
         ensureSpriteVisibility(player);
     }
 }
@@ -110,66 +121,48 @@ function manageAttacks() {
     // Regular attack for Player 1 (SPACE key)
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 pressed 'SPACE' for regular attack!");
         if (player1Mana >= 20) {
             player1Mana -= 20;
             updateManaText(player1ManaText, player1Mana);
-            console.log("Player 1 activating regular attack!");
             activateHitbox.call(this, player1, player2, 10);
-        } else {
-            console.log("Player 1 doesn't have enough mana for regular attack!");
         }
     }
 
     // Regular attack for Player 2 (Down arrow key)
     if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
-        console.log("Player 2 pressed 'DOWN' for regular attack!");
         if (player2Mana >= 20) {
             player2Mana -= 20;
             updateManaText(player2ManaText, player2Mana);
-            console.log("Player 2 activating regular attack!");
             activateHitbox.call(this, player2, player1, 10);
-        } else {
-            console.log("Player 2 doesn't have enough mana for regular attack!");
         }
     }
 
     // Super punch attack for Player 1 (S key)
     if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 pressed 'S' for super punch!");
         if (player1Mana >= 50) {
             player1Mana -= 50;
             updateManaText(player1ManaText, player1Mana);
-            console.log("Player 1 activating super punch!");
             activateSuperPunch.call(this, player1, player2);
-        } else {
-            console.log("Player 1 doesn't have enough mana for super punch!");
         }
     }
 
     // Super punch attack for Player 2 (1 key)
     if (Phaser.Input.Keyboard.JustDown(keys.ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
-        console.log("Player 2 pressed '1' for super punch!");
         if (player2Mana >= 50) {
             player2Mana -= 50;
             updateManaText(player2ManaText, player2Mana);
-            console.log("Player 2 activating super punch!");
             activateSuperPunch.call(this, player2, player1);
-        } else {
-            console.log("Player 2 doesn't have enough mana for super punch!");
         }
     }
 }
 
-// Function to activate hitbox for regular and super punch attacks
 function activateHitbox(attacker, target, damage) {
     if (!attacker || !attacker.active) return;
 
     const hitbox = this.physics.add.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null).setSize(40, 40).setVisible(false).setActive(true);
-    console.log(`Activating hitbox for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
 
     this.physics.add.overlap(hitbox, target, () => {
         handlePlayerHit(attacker, target, hitbox, damage);
@@ -181,7 +174,6 @@ function activateHitbox(attacker, target, damage) {
 }
 
 function activateSuperPunch(attacker, target) {
-    console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
     activateHitbox.call(this, attacker, target, 25);
 
     // Push the target to the edge of the screen
@@ -189,7 +181,6 @@ function activateSuperPunch(attacker, target) {
         const direction = attacker.x < target.x ? 1 : -1;
         target.setVelocityX(300 * direction);
         target.setVelocityY(-150);
-        console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and flying towards the edge of the screen!`);
     }
 }
 
@@ -197,25 +188,18 @@ function handlePlayerHit(attacker, target, hitbox, damage) {
     if (hitbox.active && target.active && !target.body.immovable) {
         if (target === player1) {
             player1Health -= damage;
-            console.log(`Player 1 hit! Health reduced by ${damage}. Current Health: ${player1Health}`);
             updateHealthText(player1HealthText, player1Health);
         } else if (target === player2) {
             player2Health -= damage;
-            console.log(`Player 2 hit! Health reduced by ${damage}. Current Health: ${player2Health}`);
             updateHealthText(player2HealthText, player2Health);
         }
 
-        // Deactivate the hitbox after a successful hit
         deactivateHitbox(hitbox);
 
-        // Restart the target character to ensure they remain visible and active
-        restartCharacter(target);
-
-        // Check if the target's health has reached 0 and end the game if so
         if (player1Health <= 0) {
-            endGame('Player 2');
+            triggerDeath(player1);
         } else if (player2Health <= 0) {
-            endGame('Player 1');
+            triggerDeath(player2);
         }
     }
 }
@@ -223,37 +207,19 @@ function handlePlayerHit(attacker, target, hitbox, damage) {
 function deactivateHitbox(hitbox) {
     if (hitbox && hitbox.active) {
         hitbox.setVisible(false).setActive(false);
-        hitbox.destroy(); // Remove the hitbox completely to prevent it from being reused
-        console.log('Hitbox deactivated');
+        hitbox.destroy();
     }
 }
 
 // Function to ensure sprite stays within bounds and is visible
 function ensureSpriteVisibility(player) {
     if (player.x < 0 || player.x > config.width || player.y < 0 || player.y > config.height) {
-        console.warn(`${player === player1 ? 'Player 1' : 'Player 2'} out of bounds, resetting position.`);
         player.setPosition(128, 200);
     }
 
-    // Ensure the player remains visible and active
     player.setVisible(true);
     player.setActive(true);
-    player.body.enable = true; // Ensure the physics body is enabled
-}
-
-// Restart character at its current position
-function restartCharacter(player) {
-    const currentPosition = { x: player.x, y: player.y };
-    console.log(`Restarting ${player === player1 ? 'Player 1' : 'Player 2'} at position: x=${currentPosition.x}, y=${currentPosition.y}`);
-    
-    // Restart the player to ensure they remain visible and active
-    player.body.enable = false; // Temporarily disable physics to reset safely
-    player.setPosition(currentPosition.x, currentPosition.y);
-    player.setVisible(true);
-    player.setActive(true);
-    player.body.enable = true; // Re-enable physics
-
-    console.log(`${player === player1 ? 'Player 1' : 'Player 2'} has been reset and is active again.`);
+    player.body.enable = true;
 }
 
 // Create a text display for health and mana
@@ -264,36 +230,51 @@ function createText(scene, x, y, text) {
 // Update the health text display when a player's health changes
 function updateHealthText(healthText, health) {
     healthText.setText('Health: ' + health);
-    console.log(`Health updated: ${healthText.text}`);
 }
 
 // Update the mana text display when a player's mana changes
 function updateManaText(manaText, mana) {
     manaText.setText('Mana: ' + mana);
-    console.log(`Mana updated: ${manaText.text}`);
 }
 
-// Recharge mana for both players every 5 seconds
+// Recharge mana over time
 function rechargeMana() {
-    if (player1Mana < 100) {
-        player1Mana = Math.min(player1Mana + 20, 100);
+    if (!gameOver) {
+        if (player1Mana < 100) player1Mana += 10;
+        if (player2Mana < 100) player2Mana += 10;
         updateManaText(player1ManaText, player1Mana);
-        console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
-    }
-    if (player2Mana < 100) {
-        player2Mana = Math.min(player2Mana + 20, 100);
         updateManaText(player2ManaText, player2Mana);
-        console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
     }
 }
 
-// End the game and declare a winner
-function endGame(winner) {
-    console.log(`${winner} wins!`);
-    gameOver = true;
-    player1.setActive(false).setVisible(false);
-    player2.setActive(false).setVisible(false);
+// Trigger the death of a character
+function triggerDeath(player) {
+    if (player && player.active) {
+        player.setVelocity(0);
+        player.body.enable = false;
+        player.setVisible(false);
+        player.setActive(false);
 
-    // Display a victory message
-    createText(this.scene, 80, 120, `${winner} Wins!`);
+        // Display a game over message
+        const winningText = player === player1 ? "Player 2 Wins!" : "Player 1 Wins!";
+        const gameOverText = this.add.text(config.width / 2 - 60, config.height / 2, winningText, { fontFamily: 'Arial', fontSize: '24px', fill: 'red' });
+        gameOverText.setScrollFactor(0);
+
+        gameOver = true;
+
+        // Stop the background music
+        if (bgMusic) {
+            bgMusic.stop();
+        }
+    }
+}
+
+// Check if either player has died
+function checkForDeath() {
+    if (player1Health <= 0) {
+        triggerDeath.call(this, player1);
+    }
+    if (player2Health <= 0) {
+        triggerDeath.call(this, player2);
+    }
 }
