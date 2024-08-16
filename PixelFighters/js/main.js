@@ -30,8 +30,11 @@ let lastPlayer1AttackTime = 0, lastPlayer2AttackTime = 0;
 let attackDelay = 500; // Delay in milliseconds
 
 function preload() {
+   
     // Load background image and player sprites
     this.load.image('background', 'assets/sprites/background.png');
+    this.load.image('background2', 'assets/sprites/background2.png'); // Load background for second map
+
     this.load.spritesheet('player1', 'assets/sprites/player1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('player2', 'assets/sprites/player2.png', { frameWidth: 32, frameHeight: 32 });
 
@@ -54,6 +57,9 @@ function preload() {
     this.load.image('spikes', 'assets/spikes.png'); // Falling traps
     this.load.image('trap', 'assets/trap.png'); // Set traps
 }
+
+
+
 function create() {
     // Add and scale the background
     const background = this.add.image(256, 240, 'background');
@@ -165,33 +171,40 @@ traps.create(150, 200, 'spikes').setScale(0.25).refreshBody();
     });
 
     // Power-up spawning event
-    this.time.addEvent({
-        delay: 12000,
-        callback: function () {
-            const items = {
-                'pack-a-punch': 0xff0000,
-                'touch-of-death': 0x00ff00,
-                'speed-boost': 0x0000ff,
-                'super-jump': 0xffff00,
-                'extra-mana': 0xff00ff,
-                'health-potion': 0x00ffff
-            };
-            const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
-            const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItemKey);
-            item.setTint(items[selectedItemKey]);
-            item.setVelocityY(50);
-            item.body.gravity.y = 20;
-            item.setData('key', selectedItemKey);
+// Power-up spawning event
+this.time.addEvent({
+    delay: 12000,
+    callback: function () {
+        const items = {
+            'pack-a-punch': 0xff0000,
+            'touch-of-death': 0x00ff00,
+            'speed-boost': 0x0000ff,
+            'super-jump': 0xffff00,
+            'extra-mana': 0xff00ff,
+            'health-potion': 0x00ffff
+        };
+        const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
+        const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItemKey);
+        item.setTint(items[selectedItemKey]);
+        item.setVelocityY(50);
+        item.body.gravity.y = 20;
+        item.setData('key', selectedItemKey);
 
-            // Ensure that items collide with platforms
-            this.physics.add.collider(item, platforms);
+        // Ensure that items collide with platforms and disappear if not collected in 10 seconds
+        this.physics.add.collider(item, platforms);
+        this.physics.add.overlap(player1, item, collectItem, null, this);
+        this.physics.add.overlap(player2, item, collectItem, null, this);
 
-            this.physics.add.overlap(player1, item, collectItem, null, this);
-            this.physics.add.overlap(player2, item, collectItem, null, this);
-        },
-        callbackScope: this,
-        loop: true
-    });
+        // Set a timeout to destroy the item if not collected
+        this.time.delayedCall(10000, () => {
+            if (item && item.active) {
+                item.destroy(); // Destroy the item if still present after 10 seconds
+            }
+        });
+    },
+    callbackScope: this,
+    loop: true
+});
 
     // Adjust camera settings
     this.cameras.main.setBounds(0, 0, 512, 480);
