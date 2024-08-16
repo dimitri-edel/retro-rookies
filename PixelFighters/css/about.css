@@ -1,0 +1,73 @@
+/* Basic reset for margin and padding */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Apply a retro linear gradient background and center content */
+body {
+    font-family: 'Courier New', Courier, monospace; 
+    background: linear-gradient(135deg, #3A1078, #4E31AA, #3795BD, #F7F7F8); 
+    color: #2e2e2e; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    text-align: center;
+}
+
+/* Style the about container */
+#about {
+    background: rgba(250, 250, 250, 0.9); 
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    width: 100%;
+    margin-bottom: 20px; 
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Style the heading and paragraph */
+#about h2 {
+    font-size: 2em;
+    margin-bottom: 10px;
+    color: #3A1078; 
+}
+
+#about p {
+    font-size: 1.2em;
+    line-height: 1.5;
+}
+
+/* Style the back button container */
+.back-btn {
+    margin-bottom: 20px; 
+}
+
+/* Style the back button */
+.button {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: #4E31AA; 
+    color: #F7F7F8; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.button:hover {
+    background-color: #2a1b76; /* Slightly lighter color on hover */
+    transform: scale(1.05); /* Slightly scale up on hover */
+}
+
+.button:active {
+    transform: scale(1); /* Reset scale on active */
+}

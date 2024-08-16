@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Play</title>
+    <link rel="stylesheet" href="css/how-to-play.css"> <!-- Link to the CSS file -->
+</head>
+<body>
+    <div id="instructions">
+        <h2>How to Play</h2>
+        <p>Use the left and right arrow keys to move the paddle and keep the ball in play. Break all the bricks to advance to the next level. The game is over when you miss the ball!</p>
+    </div>
+    <div class="back-btn">
+        <button class="button" id="backButton">Go Back</button>
+    </div>
+
+    <script>
+        document.getElementById('backButton').onclick = function() {
+            window.location.href = 'home.html';
+        };
+    </script>
+</body>
+</html>
