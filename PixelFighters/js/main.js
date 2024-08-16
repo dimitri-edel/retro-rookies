@@ -42,7 +42,6 @@ function preload() {
     this.load.image('extra-mana', 'assets/sprites/extra-mana.png'); // Mana item
     this.load.image('health-potion', 'assets/sprites/health-potion.png'); // Health potion
 }
-
 function create() {
     // Set up the game scene and physics
     this.add.image(128, 120, 'background');
@@ -60,17 +59,19 @@ function create() {
     player1 = this.physics.add.sprite(50, 200, 'player1');
     player1.setBounce(0.2);
     player1.setCollideWorldBounds(true);
-    player1.damageMultiplier = 1;  // Add this line
-    player1.jumpHeight = 300;      // Add this line
-    player1.setGravityY(-300);     // Add this line
+    player1.damageMultiplier = 1;
+    player1.jumpHeight = 150;
+    player1.speedMultiplier = 1; // Initialize speedMultiplier
+    player1.setGravityY(-300); // Standard gravity
 
     player2 = this.physics.add.sprite(200, 200, 'player2');
     player2.setBounce(0.2);
     player2.setCollideWorldBounds(true);
-    player2.damageMultiplier = 1;  // Add this line
-    player2.jumpHeight = 300;      // Add this line
-    player2.setGravityY(-300);     // Add this line
-
+    player2.damageMultiplier = 1;
+    player2.jumpHeight = 150;
+    player2.speedMultiplier = 1; // Initialize speedMultiplier
+    player2.setGravityY(-300); // Standard gravity
+    
     // Set collision with the ground
     this.physics.add.collider(player1, ground);
     this.physics.add.collider(player2, ground);
@@ -88,26 +89,40 @@ function create() {
     });
 
     this.time.addEvent({
-    delay: 10000,
-    callback: function () {
-        const items = ['pack-a-punch', 'touch-of-death', 'speed-boost', 'super-jump', 'extra-mana', 'health-potion'];
-        const selectedItem = Phaser.Math.RND.pick(items);
-        const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItem);
-        item.setVelocityY(50);
-        item.body.gravity.y = 20;
-        this.physics.add.collider(item, ground, function (item) {
-            item.setVelocityY(0);
-        });
-        this.physics.add.overlap(player1, item, collectItem, null, this);
-        this.physics.add.overlap(player2, item, collectItem, null, this);
-    },
-    callbackScope: this,
-    loop: true
-});
+        delay: 12000,
+        callback: function () {
+            const items = {
+                'pack-a-punch': 0xff0000,
+                'touch-of-death': 0x00ff00,
+                'speed-boost': 0x0000ff,
+                'super-jump': 0xffff00,
+                'extra-mana': 0xff00ff,
+                'health-potion': 0x00ffff
+            };
+            const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
+            console.log("Spawning item: " + selectedItemKey);
+            const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItemKey);
+            item.setTint(items[selectedItemKey]);
+            item.setVelocityY(50);
+            item.body.gravity.y = 20;
+            item.setData('key', selectedItemKey);
+
+            this.physics.add.collider(item, ground);
+            this.physics.add.overlap(player1, item, collectItem, null, this);
+            this.physics.add.overlap(player2, item, collectItem, null, this);
+        },
+        callbackScope: this,
+        loop: true
+    });
+
+    // Zoom effect
+    this.cameras.main.setZoom(1); // Increase zoom level to make the arena appear larger
 }
+
 
 function update() {
     if (gameOver) return;
+    // Debug player status
 
     // Validate players before trying to update their positions
     handlePlayerMovement(player1, keys.A, keys.D, keys.W);
@@ -115,58 +130,84 @@ function update() {
 
     // Manage attacks for both players
     manageAttacks.call(this);
-}
-function collectItem(player, item) {
-    const resetEffects = () => {
-        if (item.texture.key === 'speed-boost') {
-            player.setVelocityX(player.body.velocity.x / 2); // Reset speed
-        }
-        if (item.texture.key === 'super-jump') {
-            player.setGravityY(-300); // Reset gravity for jump height
-        }
-        player.damageMultiplier = 1; // Reset damage multiplier for any damage related items
-    };
 
-    switch (item.texture.key) {
+
+}
+
+function collectItem(player, item) {
+    if (!item || !item.getData('key')) {
+        console.error("Item collection failed: item data is missing.");
+        return; // Early exit if no item or key data found.
+    }
+
+    const itemKey = item.getData('key');
+    console.log("Item collected: " + itemKey); // Confirm item collection.
+
+    // Apply effects and start a timer to reset them
+    switch (itemKey) {
         case 'pack-a-punch':
-            player.damageMultiplier = 1.5;
+            player.damageMultiplier *= 1.5;
+            console.log(`Damage Multiplier Updated to: ${player.damageMultiplier}`);
+            this.time.delayedCall(15000, () => resetEffect(player, 'damageMultiplier', 1), [], this);
             break;
         case 'touch-of-death':
-            player.damageMultiplier = 2.5;
+            player.damageMultiplier *= 2.5;
+            console.log(`Damage Multiplier Updated to: ${player.damageMultiplier}`);
+            this.time.delayedCall(15000, () => resetEffect(player, 'damageMultiplier', 1), [], this);
             break;
         case 'speed-boost':
-            player.setVelocityX(player.body.velocity.x * 2);
+            player.speedMultiplier = (player.speedMultiplier || 1) * 2; // Ensure multiplier exists.
+            console.log(`Speed Multiplier Updated to: ${player.speedMultiplier}`);
+            this.time.delayedCall(15000, () => resetEffect(player, 'speedMultiplier', 1), [], this);
             break;
         case 'super-jump':
-            player.setGravityY(-900); // Increase gravity to enhance jump
+            player.jumpHeight *= 3;
+            console.log(`Jump Height Updated to: ${player.jumpHeight}`);
+            this.time.delayedCall(15000, () => resetEffect(player, 'jumpHeight', 300), [], this);
             break;
         case 'extra-mana':
-            player.mana = Math.min(player.mana + 50, 150); // Increase mana, assuming max can exceed 100 temporarily
+            player.mana = Math.min(player.mana + 50, 150);
+            console.log(`Mana Updated to: ${player.mana}`);
+            // No need to reset mana after 15 seconds
             break;
         case 'health-potion':
-            player.health += 50; // Increase health, can exceed initial max
+            player.health = Math.min(player.health + 50, player.maxHealth || 100); // Assume maxHealth if not set.
+            console.log(`Health Updated to: ${player.health}`);
+            // No need to reset health after 15 seconds
             break;
+        default:
+            console.warn(`No known effect for item: ${itemKey}`);
     }
-    item.destroy();
-    // Start a 20-second timer for temporary boosts
-    this.time.delayedCall(20000, resetEffects, [], this);
+
+    item.destroy(); // Always destroy the item after processing.
 }
 
+
+function resetEffect(player, property, defaultValue) {
+    if (player && player[property] !== undefined) {
+        player[property] = defaultValue;
+        console.log(`${property} reset to ${defaultValue}`);
+    } else {
+        console.error(`Failed to reset property: ${property}`);
+    }
+}
+
+
+// Function to handle player movement
 // Function to handle player movement
 function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
     if (player && player.active) {
         player.setVelocityX(0);
 
         if (leftKey.isDown) {
-            player.setVelocityX(-100);
+            player.setVelocityX(-100 * player.speedMultiplier); // Use speedMultiplier
         } else if (rightKey.isDown) {
-            player.setVelocityX(100);
+            player.setVelocityX(100 * player.speedMultiplier); // Use speedMultiplier
         }
         if (jumpKey.isDown && player.body.blocked.down) {
-            player.setVelocityY(-300);
+            player.setVelocityY(-player.jumpHeight); // Use modified jumpHeight
         }
 
-        // Ensure player stays within the screen bounds and is visible
         ensureSpriteVisibility(player);
     }
 }
@@ -230,14 +271,21 @@ function manageAttacks() {
 }
 
 // Function to activate hitbox for regular and super punch attacks
-function activateHitbox(attacker, target, damage) {
+// Function to activate hitbox for regular and super punch attacks
+function activateHitbox(attacker, target, baseDamage) {
     if (!attacker || !attacker.active) return;
 
     const hitbox = this.physics.add.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null).setSize(40, 40).setVisible(false).setActive(true);
     console.log(`Activating hitbox for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
 
     this.physics.add.overlap(hitbox, target, () => {
+        const damage = baseDamage * attacker.damageMultiplier; // Apply damage multiplier
         handlePlayerHit(attacker, target, hitbox, damage);
+
+        // Apply a small upward knockback for regular attacks
+        const direction = attacker.x < target.x ? 1 : -1;
+        target.setVelocityX(200 * direction); // Small horizontal pushback
+        target.setVelocityY(-100); // Moderate vertical lift to knock them upwards
     }, null, this);
 
     this.time.delayedCall(100, () => {
@@ -245,16 +293,17 @@ function activateHitbox(attacker, target, damage) {
     }, [], this);
 }
 
+
 function activateSuperPunch(attacker, target) {
     console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
     activateHitbox.call(this, attacker, target, 25);
 
-    // Push the target to the edge of the screen
+    // Apply a strong horizontal force with little to no vertical movement
     if (target.active) {
         const direction = attacker.x < target.x ? 1 : -1;
-        target.setVelocityX(300 * direction);
-        target.setVelocityY(-150);
-        console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and flying towards the edge of the screen!`);
+        target.setVelocityX(2000 * direction); // Very strong horizontal pushback
+        target.setVelocityY(0); // Slight vertical lift to give a feeling of impact
+        console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and sent flying across the screen!`);
     }
 }
 
