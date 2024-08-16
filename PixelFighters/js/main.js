@@ -31,7 +31,7 @@ let attackDelay = 500; // Delay in milliseconds
 
 function preload() {
     // Load background image and player sprites
-    this.load.image('background', 'assets/sprites/background.jpg');
+    this.load.image('background', 'assets/sprites/background.png');
     this.load.spritesheet('player1', 'assets/sprites/player1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('player2', 'assets/sprites/player2.png', { frameWidth: 32, frameHeight: 32 });
 
@@ -59,54 +59,59 @@ function create() {
     const background = this.add.image(256, 240, 'background');
     background.setScale(4);
 
-    // Create an empty static group for platforms
-    const platforms = this.physics.add.staticGroup();
 
-    // Create base platform and other platforms with more density
-    platforms.create(256, 464, 'tile_0020').setScale(12, 1).refreshBody(); // Base platform
-    platforms.create(256, 400, 'tile_0020').setScale(6, 1).refreshBody(); // Platform 1
-    platforms.create(128, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 2
-    platforms.create(384, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 3
-    platforms.create(256, 300, 'tile_0020').setScale(4, 1).refreshBody(); // Platform 4
-    platforms.create(64, 260, 'tile_0020').setScale(2, 1).refreshBody();  // Platform 5
-    platforms.create(448, 260, 'tile_0020').setScale(2, 1).refreshBody(); // Platform 6
-    platforms.create(192, 220, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 7
-    platforms.create(320, 220, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 8
+/////////////////////////////////////// EDITING THE MAP /////////////////////////////////////////////////
+const platforms = this.physics.add.staticGroup();
 
-    // Create scattered smaller platforms and tiles
-    platforms.create(256, 170, 'tile_0030').setScale(2, 1).refreshBody();
-    platforms.create(128, 120, 'tile_0030').setScale(1.5, 1).refreshBody();
-    platforms.create(384, 120, 'tile_0030').setScale(1.5, 1).refreshBody();
+// Function to get a random tile
+function getRandomTile() {
+    const randomIndex = Phaser.Math.Between(1, 75); // Random number between 1 and 75
+    return `tile_${String(randomIndex).padStart(4, '0')}`;
+}
 
-    // Scatter random tiles for a varied look
-    platforms.create(100, 350, 'tile_0010').refreshBody();
-    platforms.create(420, 380, 'tile_0015').refreshBody();
-    platforms.create(370, 240, 'tile_0018').refreshBody();
-    platforms.create(150, 240, 'tile_0012').refreshBody();
-    platforms.create(300, 180, 'tile_0025').refreshBody();
-    platforms.create(350, 140, 'tile_0035').refreshBody();
-    platforms.create(200, 100, 'tile_0040').refreshBody();
+// Base Level - Main Battleground
+platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
 
-    // Add super jump platforms at the bottom left and right
-    const leftSuperJump = platforms.create(64, 464, 'tile_0020').setScale(2, 1).refreshBody();
-    const rightSuperJump = platforms.create(448, 464, 'tile_0020').setScale(2, 1).refreshBody();
+// Intermediate Platforms (Left and Right Sides)
+platforms.create(128, 400, getRandomTile()).setScale(3, 1).refreshBody(); // Left middle platform
+platforms.create(384, 400, getRandomTile()).setScale(3, 1).refreshBody(); // Right middle platform
 
-    // Add lava at the bottom of the map
-    const lava = this.physics.add.staticGroup();
-    lava.create(256, 478, 'lava').setScale(32, 0.5).refreshBody(); // Cover the bottom with lava
+// Smaller Platforms above Intermediate Level
+platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
+platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
 
-    // Add traps around platforms and create falling traps
-    const traps = this.physics.add.group();
-    traps.create(100, 430, 'trap').setScale(0.5).refreshBody(); // Static trap on platform 1
-    traps.create(300, 260, 'trap').setScale(0.5).refreshBody(); // Static trap on platform 5
-    traps.create(250, 0, 'trap').setScale(0.5).setVelocityY(200); // Falling trap
+// Upper Platforms - High-Level for Aerial Combat
+platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+platforms.create(192, 220, getRandomTile()).setScale(3, 1).refreshBody(); // Left floating platform
+platforms.create(320, 220, getRandomTile()).setScale(3, 1).refreshBody(); // Right floating platform
+platforms.create(256, 170, getRandomTile()).setScale(4, 1).refreshBody(); // Central high platform
 
-    // Additional traps around platforms
-    traps.create(200, 430, 'spikes').setScale(0.5).refreshBody();
-    traps.create(400, 350, 'spikes').setScale(0.5).refreshBody();
-    traps.create(300, 400, 'spikes').setScale(0.5).refreshBody();
-    traps.create(150, 200, 'spikes').setScale(0.5).refreshBody();
+// Super Jump Platforms at the Bottom Left and Right
+const leftSuperJump = platforms.create(64, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+const rightSuperJump = platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
 
+// Lava Pit at the Bottom
+const lava = this.physics.add.staticGroup();
+lava.create(256, 478, 'lava').setScale(32, 0.5).refreshBody(); // Cover the bottom with lava
+
+// Traps Around Platforms
+const traps = this.physics.add.group();
+traps.create(192, 360, 'spikes').setScale(0.25).refreshBody(); // Trap on left middle platform
+
+traps.create(384, 250, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
+
+
+
+// Additional Traps on Various Platforms
+traps.create(100, 430, 'trap').setScale(0.25).refreshBody(); // Trap on platform 1
+traps.create(200, 430, 'spikes').setScale(0.25).refreshBody();
+traps.create(400, 350, 'spikes').setScale(0.25).refreshBody();
+
+traps.create(150, 200, 'spikes').setScale(0.25).refreshBody();
+
+
+/////////////////////////////////////// END OF  MAP /////////////////////////////////////////////////
     // Initialize player health and mana text displays
     player1HealthText = createText(this, 10, 10, 'Health: ' + player1Health);
     player2HealthText = createText(this, 400, 10, 'Health: ' + player2Health);
