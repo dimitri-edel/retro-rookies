@@ -24,10 +24,14 @@ let player1, player2;
 let cursors, keys;
 let player1Health = 100, player2Health = 100;
 let player1Mana = 100, player2Mana = 100;
-let player1HealthText, player2HealthText, player1ManaText, player2ManaText;
+
 let gameOver = false;
 let lastPlayer1AttackTime = 0, lastPlayer2AttackTime = 0;
 let attackDelay = 500; // Delay in milliseconds
+
+// Declare health and mana bars globally
+let player1HealthBar, player2HealthBar;
+let player1ManaBar, player2ManaBar;
 
 function preload() {
    
@@ -64,8 +68,20 @@ function create() {
     // Add and scale the background
     const background = this.add.image(256, 240, 'background');
     background.setScale(4);
+// Player 1 Health and Mana Bars
+    // Initialize player health and mana bars
+    player1HealthBar = this.add.graphics({ x: 10, y: 10 });
+    player1ManaBar = this.add.graphics({ x: 10, y: 30 });
 
+    player2HealthBar = this.add.graphics({ x: 400, y: 10 });
+    player2ManaBar = this.add.graphics({ x: 400, y: 30 });
 
+    // Draw initial bars
+    drawHealthBar(player1HealthBar, player1Health);
+    drawManaBar(player1ManaBar, player1Mana);
+
+    drawHealthBar(player2HealthBar, player2Health);
+    drawManaBar(player2ManaBar, player2Mana);
 /////////////////////////////////////// EDITING THE MAP /////////////////////////////////////////////////
 const platforms = this.physics.add.staticGroup();
 
@@ -119,12 +135,9 @@ traps.create(150, 200, 'spikes').setScale(0.25).refreshBody();
 
 /////////////////////////////////////// END OF  MAP /////////////////////////////////////////////////
     // Initialize player health and mana text displays
-    player1HealthText = createText(this, 10, 10, 'Health: ' + player1Health);
-    player2HealthText = createText(this, 400, 10, 'Health: ' + player2Health);
-    player1ManaText = createText(this, 10, 30, 'Mana: ' + player1Mana);
-    player2ManaText = createText(this, 400, 30, 'Mana: ' + player2Mana);
 
-    // Create player sprites with physics
+
+    // Create player sprites with physicswd
     player1 = this.physics.add.sprite(50, 400, 'player1');
     player2 = this.physics.add.sprite(450, 400, 'player2');
 
@@ -226,7 +239,23 @@ function hitTrap(player, trap) {
     }
 }
 
+// Function to draw the health bar
+function drawHealthBar(graphics, health) {
+    graphics.clear();
+    graphics.fillStyle(0xff0000, 1); // Red color for health
+    graphics.fillRect(0, 0, health, 10); // Draw health bar based on health value
+    graphics.lineStyle(2, 0x000000, 1); // Black outline for better visibility
+    graphics.strokeRect(0, 0, 100, 10); // Fixed size outline for the health bar
+}
 
+// Function to draw the mana bar
+function drawManaBar(graphics, mana) {
+    graphics.clear();
+    graphics.fillStyle(0x0000ff, 1); // Blue color for mana
+    graphics.fillRect(0, 0, mana, 10); // Draw mana bar based on mana value
+    graphics.lineStyle(2, 0x000000, 1); // Black outline for better visibility
+    graphics.strokeRect(0, 0, 100, 10); // Fixed size outline for the mana bar
+}
 
 function update() {
     if (gameOver) return;
@@ -319,7 +348,6 @@ function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
         ensureSpriteVisibility(player);
     }
 }
-
 function manageAttacks() {
     // Regular attack for Player 1 (SPACE key)
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
@@ -327,7 +355,7 @@ function manageAttacks() {
         console.log("Player 1 pressed 'SPACE' for regular attack!");
         if (player1Mana >= 20) {
             player1Mana -= 20;
-            updateManaText(player1ManaText, player1Mana);
+            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
             console.log("Player 1 activating regular attack!");
             activateHitbox.call(this, player1, player2, 10);
         } else {
@@ -341,25 +369,11 @@ function manageAttacks() {
         console.log("Player 2 pressed 'DOWN' for regular attack!");
         if (player2Mana >= 20) {
             player2Mana -= 20;
-            updateManaText(player2ManaText, player2Mana);
+            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
             console.log("Player 2 activating regular attack!");
             activateHitbox.call(this, player2, player1, 10);
         } else {
             console.log("Player 2 doesn't have enough mana for regular attack!");
-        }
-    }
-
-    // Super punch attack for Player 1 (S key)
-    if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
-        lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 pressed 'S' for super punch!");
-        if (player1Mana >= 50) {
-            player1Mana -= 50;
-            updateManaText(player1ManaText, player1Mana);
-            console.log("Player 1 activating super punch!");
-            activateSuperPunch.call(this, player1, player2);
-        } else {
-            console.log("Player 1 doesn't have enough mana for super punch!");
         }
     }
 
@@ -369,7 +383,7 @@ function manageAttacks() {
         console.log("Player 2 pressed '1' for super punch!");
         if (player2Mana >= 50) {
             player2Mana -= 50;
-            updateManaText(player2ManaText, player2Mana);
+            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
             console.log("Player 2 activating super punch!");
             activateSuperPunch.call(this, player2, player1);
         } else {
@@ -377,6 +391,8 @@ function manageAttacks() {
         }
     }
 }
+
+
 
 // Function to activate hitbox for regular and super punch attacks
 // Function to activate hitbox for regular and super punch attacks
@@ -414,17 +430,16 @@ function activateSuperPunch(attacker, target) {
         console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and sent flying across the screen!`);
     }
 }
-
 function handlePlayerHit(attacker, target, hitbox, damage) {
     if (hitbox.active && target.active && !target.body.immovable) {
         if (target === player1) {
             player1Health -= damage;
             console.log(`Player 1 hit! Health reduced by ${damage}. Current Health: ${player1Health}`);
-            updateHealthText(player1HealthText, player1Health);
+            drawHealthBar(player1HealthBar, player1Health); // Update health bar
         } else if (target === player2) {
             player2Health -= damage;
             console.log(`Player 2 hit! Health reduced by ${damage}. Current Health: ${player2Health}`);
-            updateHealthText(player2HealthText, player2Health);
+            drawHealthBar(player2HealthBar, player2Health); // Update health bar
         }
 
         // Deactivate the hitbox after a successful hit
@@ -441,6 +456,7 @@ function handlePlayerHit(attacker, target, hitbox, damage) {
         }
     }
 }
+
 
 function deactivateHitbox(hitbox) {
     if (hitbox && hitbox.active) {
@@ -484,27 +500,18 @@ function createText(scene, x, y, text) {
 }
 
 // Update the health text display when a player's health changes
-function updateHealthText(healthText, health) {
-    healthText.setText('Health: ' + health);
-    console.log(`Health updated: ${healthText.text}`);
-}
 
-// Update the mana text display when a player's mana changes
-function updateManaText(manaText, mana) {
-    manaText.setText('Mana: ' + mana);
-    console.log(`Mana updated: ${manaText.text}`);
-}
 
 // Recharge mana for both players every 5 seconds
 function rechargeMana() {
     if (player1Mana < 100) {
         player1Mana = Math.min(player1Mana + 20, 100);
-        updateManaText(player1ManaText, player1Mana);
+        drawManaBar(player1ManaBar, player1Mana); // Update mana bar
         console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
     }
     if (player2Mana < 100) {
         player2Mana = Math.min(player2Mana + 20, 100);
-        updateManaText(player2ManaText, player2Mana);
+        drawManaBar(player2ManaBar, player2Mana); // Update mana bar
         console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
     }
 }
@@ -528,3 +535,7 @@ function endGame(winner) {
 
     console.log(gameOverText.text);  // Ensure the text is created correctly
 }
+
+
+
+
