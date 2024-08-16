@@ -1,7 +1,7 @@
 const config = {
     type: Phaser.AUTO,
-    width: 256,
-    height: 240,
+    width: 512,  // Double the width
+    height: 480, // Double the height
     parent: 'game-container',
     pixelArt: true,
     physics: {
@@ -30,57 +30,95 @@ let lastPlayer1AttackTime = 0, lastPlayer2AttackTime = 0;
 let attackDelay = 500; // Delay in milliseconds
 
 function preload() {
-    // Load assets for the game
+    // Load background image and player sprites
     this.load.image('background', 'assets/sprites/background.jpg');
     this.load.spritesheet('player1', 'assets/sprites/player1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('player2', 'assets/sprites/player2.png', { frameWidth: 32, frameHeight: 32 });
-    this.load.image('ground', 'assets/sprites/ground.png');
-    this.load.image('pack-a-punch', 'assets/sprites/pack-a-punch.png'); // 1.5x damage multiplier
-    this.load.image('touch-of-death', 'assets/sprites/touch-of-death.png'); // 2.5x damage multiplier
-    this.load.image('speed-boost', 'assets/sprites/speed-boost.png'); // 2x speed multiplier
-    this.load.image('super-jump', 'assets/sprites/super-jump.png'); // 3x jump height
-    this.load.image('extra-mana', 'assets/sprites/extra-mana.png'); // Mana item
-    this.load.image('health-potion', 'assets/sprites/health-potion.png'); // Health potion
+
+    // Load power-up items
+    this.load.image('pack-a-punch', 'assets/sprites/pack-a-punch.png');
+    this.load.image('touch-of-death', 'assets/sprites/touch-of-death.png');
+    this.load.image('speed-boost', 'assets/sprites/speed-boost.png');
+    this.load.image('super-jump', 'assets/sprites/super-jump.png');
+    this.load.image('extra-mana', 'assets/sprites/extra-mana.png');
+    this.load.image('health-potion', 'assets/sprites/health-potion.png');
+
+    // Load tiles
+    for (let i = 1; i <= 75; i++) {
+        const tileId = `tile_${String(i).padStart(4, '0')}`;
+        this.load.image(tileId, `assets/${tileId}.png`);
+    }
 }
 function create() {
-    // Set up the game scene and physics
-    this.add.image(128, 120, 'background');
+    // Add and scale the background
+    const background = this.add.image(256, 240, 'background');
+    background.setScale(4);
 
-    const ground = this.physics.add.staticGroup();
-    ground.create(128, 230, 'ground').setScale(1).refreshBody();
+    // Create an empty static group for platforms
+    const platforms = this.physics.add.staticGroup();
 
-    // Initialize health and mana text for both players
+    // Create base platform and other platforms with more density
+    platforms.create(256, 464, 'tile_0020').setScale(8, 1).refreshBody(); // Base platform
+    platforms.create(256, 400, 'tile_0020').setScale(6, 1).refreshBody(); // Platform 1
+    platforms.create(128, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 2
+    platforms.create(384, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 3
+    platforms.create(256, 300, 'tile_0020').setScale(4, 1).refreshBody(); // Platform 4
+    platforms.create(64, 260, 'tile_0020').setScale(2, 1).refreshBody();  // Platform 5
+    platforms.create(448, 260, 'tile_0020').setScale(2, 1).refreshBody(); // Platform 6
+    platforms.create(192, 220, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 7
+    platforms.create(320, 220, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 8
+
+    // Create scattered smaller platforms and tiles
+    platforms.create(256, 170, 'tile_0030').setScale(2, 1).refreshBody();
+    platforms.create(128, 120, 'tile_0030').setScale(1.5, 1).refreshBody();
+    platforms.create(384, 120, 'tile_0030').setScale(1.5, 1).refreshBody();
+
+    // Scatter random tiles for a varied look
+    platforms.create(100, 350, 'tile_0010').refreshBody();
+    platforms.create(420, 380, 'tile_0015').refreshBody();
+    platforms.create(370, 240, 'tile_0018').refreshBody();
+    platforms.create(150, 240, 'tile_0012').refreshBody();
+    platforms.create(300, 180, 'tile_0025').refreshBody();
+    platforms.create(350, 140, 'tile_0035').refreshBody();
+    platforms.create(200, 100, 'tile_0040').refreshBody();
+
+    // Add super jump platforms at the bottom left and right
+    const leftSuperJump = platforms.create(64, 464, 'tile_0020').setScale(2, 1).refreshBody();
+    const rightSuperJump = platforms.create(448, 464, 'tile_0020').setScale(2, 1).refreshBody();
+
+    // Initialize player health and mana text displays
     player1HealthText = createText(this, 10, 10, 'Health: ' + player1Health);
-    player2HealthText = createText(this, 160, 10, 'Health: ' + player2Health);
+    player2HealthText = createText(this, 400, 10, 'Health: ' + player2Health);
     player1ManaText = createText(this, 10, 30, 'Mana: ' + player1Mana);
-    player2ManaText = createText(this, 160, 30, 'Mana: ' + player2Mana);
+    player2ManaText = createText(this, 400, 30, 'Mana: ' + player2Mana);
 
     // Create player sprites with physics
-    player1 = this.physics.add.sprite(50, 200, 'player1');
+    player1 = this.physics.add.sprite(50, 400, 'player1');
+    player2 = this.physics.add.sprite(450, 400, 'player2');
+
     player1.setBounce(0.2);
     player1.setCollideWorldBounds(true);
     player1.damageMultiplier = 1;
-    player1.jumpHeight = 150;
-    player1.speedMultiplier = 1; // Initialize speedMultiplier
-    player1.setGravityY(-300); // Standard gravity
+    player1.jumpHeight = 200;
+    player1.speedMultiplier = 1;
+    player1.setGravityY(-300);
 
-    player2 = this.physics.add.sprite(200, 200, 'player2');
     player2.setBounce(0.2);
     player2.setCollideWorldBounds(true);
     player2.damageMultiplier = 1;
-    player2.jumpHeight = 150;
-    player2.speedMultiplier = 1; // Initialize speedMultiplier
-    player2.setGravityY(-300); // Standard gravity
-    
-    // Set collision with the ground
-    this.physics.add.collider(player1, ground);
-    this.physics.add.collider(player2, ground);
+    player2.jumpHeight = 200;
+    player2.speedMultiplier = 1;
+    player2.setGravityY(-300);
 
-    // Set up control inputs
+    // Add collision between players and platforms
+    this.physics.add.collider(player1, platforms);
+    this.physics.add.collider(player2, platforms);
+
+    // Set up input controls
     cursors = this.input.keyboard.createCursorKeys();
     keys = this.input.keyboard.addKeys('W,A,S,D,SPACE,ONE');
 
-    // Set up mana regeneration loop every 5 seconds
+    // Mana regeneration event
     this.time.addEvent({
         delay: 5000,
         callback: rechargeMana,
@@ -88,6 +126,7 @@ function create() {
         loop: true
     });
 
+    // Power-up spawning event
     this.time.addEvent({
         delay: 12000,
         callback: function () {
@@ -100,14 +139,15 @@ function create() {
                 'health-potion': 0x00ffff
             };
             const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
-            console.log("Spawning item: " + selectedItemKey);
             const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItemKey);
             item.setTint(items[selectedItemKey]);
             item.setVelocityY(50);
             item.body.gravity.y = 20;
             item.setData('key', selectedItemKey);
 
-            this.physics.add.collider(item, ground);
+            // Ensure that items collide with platforms
+            this.physics.add.collider(item, platforms);
+
             this.physics.add.overlap(player1, item, collectItem, null, this);
             this.physics.add.overlap(player2, item, collectItem, null, this);
         },
@@ -115,9 +155,15 @@ function create() {
         loop: true
     });
 
-    // Zoom effect
-    this.cameras.main.setZoom(1); // Increase zoom level to make the arena appear larger
+    // Adjust camera settings
+    this.cameras.main.setBounds(0, 0, 512, 480);
+    this.cameras.main.setZoom(1);
+    this.cameras.main.startFollow(player1);
 }
+
+
+
+
 
 
 function update() {
@@ -163,7 +209,7 @@ function collectItem(player, item) {
         case 'super-jump':
             player.jumpHeight *= 3;
             console.log(`Jump Height Updated to: ${player.jumpHeight}`);
-            this.time.delayedCall(15000, () => resetEffect(player, 'jumpHeight', 300), [], this);
+            this.time.delayedCall(15000, () => resetEffect(player, 'jumpHeight', 200), [], this);
             break;
         case 'extra-mana':
             player.mana = Math.min(player.mana + 50, 150);
@@ -302,7 +348,7 @@ function activateSuperPunch(attacker, target) {
     if (target.active) {
         const direction = attacker.x < target.x ? 1 : -1;
         target.setVelocityX(2000 * direction); // Very strong horizontal pushback
-        target.setVelocityY(0); // Slight vertical lift to give a feeling of impact
+        target.setVelocityY(-100); // Slight vertical lift to give a feeling of impact
         console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and sent flying across the screen!`);
     }
 }
