@@ -48,6 +48,11 @@ function preload() {
         const tileId = `tile_${String(i).padStart(4, '0')}`;
         this.load.image(tileId, `assets/${tileId}.png`);
     }
+
+    // Load new assets for lava, falling traps, and set traps
+    this.load.image('lava', 'assets/fire.png'); // Lava
+    this.load.image('spikes', 'assets/spikes.png'); // Falling traps
+    this.load.image('trap', 'assets/trap.png'); // Set traps
 }
 function create() {
     // Add and scale the background
@@ -58,7 +63,7 @@ function create() {
     const platforms = this.physics.add.staticGroup();
 
     // Create base platform and other platforms with more density
-    platforms.create(256, 464, 'tile_0020').setScale(8, 1).refreshBody(); // Base platform
+    platforms.create(256, 464, 'tile_0020').setScale(12, 1).refreshBody(); // Base platform
     platforms.create(256, 400, 'tile_0020').setScale(6, 1).refreshBody(); // Platform 1
     platforms.create(128, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 2
     platforms.create(384, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 3
@@ -86,6 +91,22 @@ function create() {
     const leftSuperJump = platforms.create(64, 464, 'tile_0020').setScale(2, 1).refreshBody();
     const rightSuperJump = platforms.create(448, 464, 'tile_0020').setScale(2, 1).refreshBody();
 
+    // Add lava at the bottom of the map
+    const lava = this.physics.add.staticGroup();
+    lava.create(256, 478, 'lava').setScale(32, 0.5).refreshBody(); // Cover the bottom with lava
+
+    // Add traps around platforms and create falling traps
+    const traps = this.physics.add.group();
+    traps.create(100, 430, 'trap').setScale(0.5).refreshBody(); // Static trap on platform 1
+    traps.create(300, 260, 'trap').setScale(0.5).refreshBody(); // Static trap on platform 5
+    traps.create(250, 0, 'trap').setScale(0.5).setVelocityY(200); // Falling trap
+
+    // Additional traps around platforms
+    traps.create(200, 430, 'spikes').setScale(0.5).refreshBody();
+    traps.create(400, 350, 'spikes').setScale(0.5).refreshBody();
+    traps.create(300, 400, 'spikes').setScale(0.5).refreshBody();
+    traps.create(150, 200, 'spikes').setScale(0.5).refreshBody();
+
     // Initialize player health and mana text displays
     player1HealthText = createText(this, 10, 10, 'Health: ' + player1Health);
     player2HealthText = createText(this, 400, 10, 'Health: ' + player2Health);
@@ -99,20 +120,32 @@ function create() {
     player1.setBounce(0.2);
     player1.setCollideWorldBounds(true);
     player1.damageMultiplier = 1;
-    player1.jumpHeight = 200;
+    player1.jumpHeight = 250;
     player1.speedMultiplier = 1;
     player1.setGravityY(-300);
 
     player2.setBounce(0.2);
     player2.setCollideWorldBounds(true);
     player2.damageMultiplier = 1;
-    player2.jumpHeight = 200;
+    player2.jumpHeight = 250;
     player2.speedMultiplier = 1;
     player2.setGravityY(-300);
 
-    // Add collision between players and platforms
+    // Add collision between players and platforms, traps, and lava
+// Add collision between players and platforms, traps, and lava
     this.physics.add.collider(player1, platforms);
     this.physics.add.collider(player2, platforms);
+    this.physics.add.collider(traps, platforms); // Make sure traps collide with platforms
+    this.physics.add.collider(traps, lava, () => traps.setActive(false)); // Deactivate traps that fall into lava
+
+    // Ensure players are not getting the error by properly initializing the overlap after players are created
+    this.physics.add.overlap(player1, lava, hitLava, null, this);
+    this.physics.add.overlap(player2, lava, hitLava, null, this);
+
+    this.physics.add.overlap(player1, traps, hitTrap, null, this);
+    this.physics.add.overlap(player2, traps, hitTrap, null, this);
+
+
 
     // Set up input controls
     cursors = this.input.keyboard.createCursorKeys();
@@ -161,8 +194,19 @@ function create() {
     this.cameras.main.startFollow(player1);
 }
 
+function hitLava(player, lava) {
+    if (!gameOver) {
+        console.log(`${player === player1 ? 'Player 1' : 'Player 2'} fell into the lava. Instant Game Over.`);
+        endGame.call(this, player === player1 ? 'Player 2' : 'Player 1');
+    }
+}
 
-
+function hitTrap(player, trap) {
+    if (!gameOver) {
+        console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap at (${trap.x}, ${trap.y}). Instant Game Over.`);
+        endGame.call(this, player === player1 ? 'Player 2' : 'Player 1');
+    }
+}
 
 
 
@@ -451,9 +495,18 @@ function rechargeMana() {
 function endGame(winner) {
     console.log(`${winner} wins!`);
     gameOver = true;
+    
+    // Make players inactive and invisible
     player1.setActive(false).setVisible(false);
     player2.setActive(false).setVisible(false);
 
-    // Display a victory message
-    createText(this.scene, 80, 120, `${winner} Wins!`);
+    // Ensure `this.add.text` is used correctly
+    const gameOverText = this.add.text(256, 240, `${winner} Wins!`, {
+        fontFamily: 'Arial',
+        fontSize: '32px',
+        fill: 'red',
+        fontStyle: 'bold'
+    }).setOrigin(0.5);  // Center the text on screen
+
+    console.log(gameOverText.text);  // Ensure the text is created correctly
 }
