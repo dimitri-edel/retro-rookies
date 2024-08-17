@@ -98,6 +98,10 @@ class MainGame extends Phaser.Scene {
 			const tileId = `tile_${String(i).padStart(4, "0")}`;
 			this.load.image(tileId, `assets/${tileId}.png`);
 		}
+    // Load audio files for sound effects
+    this.load.audio('regular-attack', 'assets/sounds/regular-attack.mp3');
+    this.load.audio('super-attack', 'assets/sounds/super-attack.mp3');
+    this.load.audio('jump', 'assets/sounds/jump.mp3');
 
 		// Load lava, traps, and other necessary assets
 		this.load.image("lava", "assets/fire.png");
@@ -111,7 +115,17 @@ class MainGame extends Phaser.Scene {
 		background.setScale(4);
 
 		const platforms = this.physics.add.staticGroup();
+// Define sounds for regular and super attacks
+const regularAttackSound = this.sound.add('regular-attack', { rate: 1 }); // Keep normal playback rate
+const superAttackSound = this.sound.add('super-attack', { rate: 1 }); // Keep normal playback rate
+const jumpSound = this.sound.add('jump', { rate: 1 }); // Keep normal playback rate
 
+// Store these sounds for easy access in other functions
+this.gameSounds = {
+    regularAttack: regularAttackSound,
+    superAttack: superAttackSound,
+    jump: jumpSound
+};
 		// Function to get a random tile
 		function getRandomTile() {
 			const randomIndex = Phaser.Math.Between(1, 75);
@@ -190,8 +204,15 @@ drawManaBar(player2ManaBar, player2Mana);
 		this.physics.add.overlap(player2, traps, hitTrap, null, this);
 
 		// Set up input controls
-		cursors = this.input.keyboard.createCursorKeys();
-		keys = this.input.keyboard.addKeys("W,A,S,D,SPACE,ONE");
+    cursors = this.input.keyboard.createCursorKeys();
+    keys = this.input.keyboard.addKeys({
+        W: Phaser.Input.Keyboard.KeyCodes.W,
+        A: Phaser.Input.Keyboard.KeyCodes.A,
+        S: Phaser.Input.Keyboard.KeyCodes.S,
+        D: Phaser.Input.Keyboard.KeyCodes.D,
+        SPACE: Phaser.Input.Keyboard.KeyCodes.SPACE,
+        NUMPAD_ONE: Phaser.Input.Keyboard.KeyCodes.NUMPAD_ONE // Ensure correct key code
+    });
 
 		// Mana regeneration event
 		this.time.addEvent({
@@ -201,38 +222,41 @@ drawManaBar(player2ManaBar, player2Mana);
 			loop: true,
 		});
 
-		// Power-up spawning event
-		this.time.addEvent({
-			delay: 12000,
-			callback: function () {
-				const items = {
-					"pack-a-punch": 0xff0000,
-					"touch-of-death": 0x00ff00,
-					"speed-boost": 0x0000ff,
-					"super-jump": 0xffff00,
-					"extra-mana": 0xff00ff,
-					"health-potion": 0x00ffff,
-				};
-				const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
-				const item = this.physics.add.sprite(
-					Phaser.Math.Between(0, config.width),
-					0,
-					selectedItemKey
-				);
-				item.setTint(items[selectedItemKey]);
-				item.setVelocityY(50);
-				item.body.gravity.y = 20;
-				item.setData("key", selectedItemKey);
+	// Power-up spawning event
+this.time.addEvent({
+    delay: 6000,
+    callback: function () {
+        const items = {
+            'pack-a-punch': 0xff0000,
+            'touch-of-death': 0x00ff00,
+            'speed-boost': 0x0000ff,
+            'super-jump': 0xffff00,
+            'extra-mana': 0xff00ff,
+            'health-potion': 0x00ffff
+        };
+        const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
+        const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItemKey);
+        item.setTint(items[selectedItemKey]);
+        item.setVelocityY(50);
+        item.body.gravity.y = 20;
+        item.setData('key', selectedItemKey);
+        item.setScale(0.25);
 
-				// Ensure that items collide with platforms
-				this.physics.add.collider(item, platforms);
+        // Ensure that items collide with platforms and disappear if not collected in 10 seconds
+        this.physics.add.collider(item, platforms);
+        this.physics.add.overlap(player1, item, collectItem, null, this);
+        this.physics.add.overlap(player2, item, collectItem, null, this);
 
-				this.physics.add.overlap(player1, item, collectItem, null, this);
-				this.physics.add.overlap(player2, item, collectItem, null, this);
-			},
-			callbackScope: this,
-			loop: true,
-		});
+        // Set a timeout to destroy the item if not collected
+        this.time.delayedCall(10000, () => {
+            if (item && item.active) {
+                item.destroy(); // Destroy the item if still present after 10 seconds
+            }
+        });
+    },
+    callbackScope: this,
+    loop: true
+});
 
 		// Adjust camera settings
 		this.cameras.main.setBounds(0, 0, 512, 480);
@@ -366,74 +390,58 @@ function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
 }
 
 function manageAttacks() {
-	// Regular attack for Player 1 (SPACE key)
-	if (
-		Phaser.Input.Keyboard.JustDown(keys.SPACE) &&
-		this.time.now > lastPlayer1AttackTime + attackDelay
-	) {
-		lastPlayer1AttackTime = this.time.now;
-		console.log("Player 1 pressed 'SPACE' for regular attack!");
-		if (player1Mana >= 20) {
-			player1Mana -= 20;
-			drawManaBar(player1ManaBar, player1Mana);
+    // Regular attack for Player 1 (SPACE key)
+    if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
+        lastPlayer1AttackTime = this.time.now;
+        if (player1Mana >= 20) {
+            player1Mana -= 20;
+            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+            this.gameSounds.regularAttack.play(); // Play regular attack sound
+            activateHitbox.call(this, player1, player2, 10);
+        } else {
+            console.log("Player 1 doesn't have enough mana for regular attack!");
+        }
+    }
 
-			console.log("Player 1 activating regular attack!");
-			activateHitbox.call(this, player1, player2, 10);
-		} else {
-			console.log("Player 1 doesn't have enough mana for regular attack!");
-		}
-	}
+    // Super punch attack for Player 1 (S key)
+    if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
+        lastPlayer1AttackTime = this.time.now;
+        if (player1Mana >= 50) {
+            player1Mana -= 50;
+            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+            this.gameSounds.superAttack.play(); // Play super punch sound
+            activateSuperPunch.call(this, player1, player2);
+        } else {
+            console.log("Player 1 doesn't have enough mana for super punch!");
+        }
+    }
 
-	// Regular attack for Player 2 (Down arrow key)
-	if (
-		Phaser.Input.Keyboard.JustDown(cursors.down) &&
-		this.time.now > lastPlayer2AttackTime + attackDelay
-	) {
-		lastPlayer2AttackTime = this.time.now;
-		console.log("Player 2 pressed 'DOWN' for regular attack!");
-		if (player2Mana >= 20) {
-			player2Mana -= 20;
-			drawManaBar(player2ManaBar, player2Mana);
-			console.log("Player 2 activating regular attack!");
-			activateHitbox.call(this, player2, player1, 10);
-		} else {
-			console.log("Player 2 doesn't have enough mana for regular attack!");
-		}
-	}
+    // Similar implementation for Player 2
+    // Regular attack for Player 2 (Down arrow key)
+    if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+        lastPlayer2AttackTime = this.time.now;
+        if (player2Mana >= 20) {
+            player2Mana -= 20;
+            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+            this.gameSounds.regularAttack.play(); // Play regular attack sound
+            activateHitbox.call(this, player2, player1, 10);
+        } else {
+            console.log("Player 2 doesn't have enough mana for regular attack!");
+        }
+    }
 
-	// Super punch attack for Player 1 (S key)
-	if (
-		Phaser.Input.Keyboard.JustDown(keys.S) &&
-		this.time.now > lastPlayer1AttackTime + attackDelay
-	) {
-		lastPlayer1AttackTime = this.time.now;
-		console.log("Player 1 pressed 'S' for super punch!");
-		if (player1Mana >= 50) {
-			player1Mana -= 50;
-			drawManaBar(player1ManaBar, player1Mana);
-			console.log("Player 1 activating super punch!");
-			activateSuperPunch.call(this, player1, player2);
-		} else {
-			console.log("Player 1 doesn't have enough mana for super punch!");
-		}
-	}
-
-	// Super punch attack for Player 2 (1 key)
-	if (
-		Phaser.Input.Keyboard.JustDown(keys.ONE) &&
-		this.time.now > lastPlayer2AttackTime + attackDelay
-	) {
-		lastPlayer2AttackTime = this.time.now;
-		console.log("Player 2 pressed '1' for super punch!");
-		if (player2Mana >= 50) {
-			player2Mana -= 50;
-			drawManaBar(player2ManaBar, player2Mana);
-			console.log("Player 2 activating super punch!");
-			activateSuperPunch.call(this, player2, player1);
-		} else {
-			console.log("Player 2 doesn't have enough mana for super punch!");
-		}
-	}
+    // Super punch attack for Player 2 (NUMPAD_ONE key)
+    if (Phaser.Input.Keyboard.JustDown(keys.NUMPAD_ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+        lastPlayer2AttackTime = this.time.now;
+        if (player2Mana >= 50) {
+            player2Mana -= 50;
+            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+            this.gameSounds.superAttack.play(); // Play super punch sound
+            activateSuperPunch.call(this, player2, player1);
+        } else {
+            console.log("Player 2 doesn't have enough mana for super punch!");
+        }
+    }
 }
 
 // Function to activate hitbox for regular and super punch attacks
@@ -476,63 +484,67 @@ function activateHitbox(attacker, target, baseDamage) {
 }
 
 function activateSuperPunch(attacker, target) {
-	console.log(
-		`Activating super punch for ${
-			attacker === player1 ? "Player 1" : "Player 2"
-		}`
-	);
-	activateHitbox.call(this, attacker, target, 25);
+    // Calculate the distance between the attacker and the target
+    const distance = Phaser.Math.Distance.Between(attacker.x, attacker.y, target.x, target.y);
+    const attackRange = 200; // Define the range within which the super punch is effective
 
-	// Apply a strong horizontal force with little to no vertical movement
-	if (target.active) {
-		const direction = attacker.x < target.x ? 1 : -1;
-		target.setVelocityX(2000 * direction); // Very strong horizontal pushback
-		target.setVelocityY(-100); // Slight vertical lift to give a feeling of impact
-		console.log(
-			`${
-				target === player1 ? "Player 1" : "Player 2"
-			} is hit and sent flying across the screen!`
-		);
-	}
+    console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
+
+    // Check if the target is within the super punch range
+    if (distance <= attackRange) {
+        const hitbox = this.physics.add.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null).setSize(40, 40).setVisible(false).setActive(true);
+        this.physics.add.overlap(hitbox, target, () => {
+            const damage = 25 * attacker.damageMultiplier; // Calculate damage with multiplier
+            handlePlayerHit(attacker, target, hitbox, damage);
+            
+            // Apply a strong horizontal force based on the direction the attacker is facing
+            const direction = attacker.x < target.x ? 1 : -1;
+            target.setVelocityX(-2000 * direction); // Significant horizontal push
+            target.setVelocityY(0); // No vertical movement, focusing on horizontal impact
+
+        }, null, this);
+        
+        // Ensure the hitbox is removed shortly after activation
+        this.time.delayedCall(100, () => {
+            hitbox.destroy();
+        }, [], this);
+    } else {
+        console.log(`Super punch missed due to distance. Distance was ${distance}, required ${attackRange}.`);
+    }
 }
-
 function handlePlayerHit(attacker, target, hitbox, damage) {
-	if (hitbox.active && target.active && !target.body.immovable) {
-		if (target === player1) {
-			player1Health -= damage;
-			console.log(
-				`Player 1 hit! Health reduced by ${damage}. Current Health: ${player1Health}`
-			);
-			drawHealthBar(player1HealthBar, player1Health);
-		} else if (target === player2) {
-			player2Health -= damage;
-			console.log(
-				`Player 2 hit! Health reduced by ${damage}. Current Health: ${player2Health}`
-			);
-			drawHealthBar(player2HealthBar, player2Health);
-		}
+    if (hitbox.active && target.active && !target.body.immovable) {
+        if (target === player1) {
+            player1Health -= damage;
+            console.log(`Player 1 hit! Health reduced by ${damage}. Current Health: ${player1Health}`);
+            drawHealthBar(player1HealthBar, player1Health); // Update health bar
+        } else if (target === player2) {
+            player2Health -= damage;
+            console.log(`Player 2 hit! Health reduced by ${damage}. Current Health: ${player2Health}`);
+            drawHealthBar(player2HealthBar, player2Health); // Update health bar
+        }
 
-		// Deactivate the hitbox after a successful hit
-		deactivateHitbox(hitbox);
+        // Deactivate the hitbox after a successful hit
+        deactivateHitbox(hitbox);
 
-		// Restart the target character to ensure they remain visible and active
-		restartCharacter(target);
+        // Restart the target character to ensure they remain visible and active
+        restartCharacter(target);
 
-		// Check if the target's health has reached 0 and end the game if so
-		if (player1Health <= 0) {
-			endGame("Player 2");
-		} else if (player2Health <= 0) {
-			endGame("Player 1");
-		}
-	}
+        // Check if the target's health has reached 0 and end the game if so
+        if (player1Health <= 0) {
+            endGame('Player 2');
+        } else if (player2Health <= 0) {
+            endGame('Player 1');
+        }
+    }
 }
 
 function deactivateHitbox(hitbox) {
-	if (hitbox && hitbox.active) {
-		hitbox.setVisible(false).setActive(false);
-		hitbox.destroy(); // Remove the hitbox completely to prevent it from being reused
-		console.log("Hitbox deactivated");
-	}
+    if (hitbox && hitbox.active) {
+        hitbox.setVisible(false).setActive(false);
+        hitbox.destroy(); // Remove the hitbox completely to prevent it from being reused
+        console.log('Hitbox deactivated');
+    }
 }
 
 // Function to ensure sprite stays within bounds and is visible
