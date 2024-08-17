@@ -49,6 +49,9 @@ function preload() {
     this.load.image('super-jump', 'assets/sprites/super-jump.png');
     this.load.image('extra-mana', 'assets/sprites/extra-mana.png');
     this.load.image('health-potion', 'assets/sprites/health-potion.png');
+    this.load.audio('regular-attack', 'assets/sounds/regular-attack.mp3');
+    this.load.audio('super-attack', 'assets/sounds/super-attack.mp3');
+    this.load.audio('jump', 'assets/sounds/jump.mp3');
 
     // Load tiles
     for (let i = 1; i <= 75; i++) {
@@ -60,6 +63,8 @@ function preload() {
     this.load.image('lava', 'assets/fire.png'); // Lava
     this.load.image('spikes', 'assets/spikes.png'); // Falling traps
     this.load.image('trap', 'assets/trap.png'); // Set traps
+
+
 }
 
 
@@ -68,6 +73,17 @@ function create() {
     // Add and scale the background
     const background = this.add.image(256, 240, 'background');
     background.setScale(4);
+///// Sounnd effects 
+
+    const regularAttackSound = this.sound.add('regular-attack', { rate: 2 }); // Double the playback rate
+    const superAttackSound = this.sound.add('super-attack', { rate: 2 }); // Double the playback rate
+    const jumpSound = this.sound.add('jump', { rate: 2 }); // Double the playback rate
+    this.gameSounds = {
+        regularAttack: regularAttackSound,
+        superAttack: superAttackSound,
+        jump: jumpSound // Initialize the jump sound
+    };
+    
 // Player 1 Health and Mana Bars
     // Initialize player health and mana bars
     player1HealthBar = this.add.graphics({ x: 10, y: 10 });
@@ -172,8 +188,15 @@ traps.create(150, 200, 'spikes').setScale(0.25).refreshBody();
 
 
     // Set up input controls
-    cursors = this.input.keyboard.createCursorKeys();
-    keys = this.input.keyboard.addKeys('W,A,S,D,SPACE,ONE');
+cursors = this.input.keyboard.createCursorKeys();
+keys = this.input.keyboard.addKeys({
+    'W': Phaser.Input.Keyboard.KeyCodes.W,
+    'A': Phaser.Input.Keyboard.KeyCodes.A,
+    'S': Phaser.Input.Keyboard.KeyCodes.S,
+    'D': Phaser.Input.Keyboard.KeyCodes.D,
+    'SPACE': Phaser.Input.Keyboard.KeyCodes.SPACE,
+    'NUMPAD_ONE': Phaser.Input.Keyboard.KeyCodes.NUMPAD_ONE  // Use this key code for Player 2's super punch
+});
 
     // Mana regeneration event
     this.time.addEvent({
@@ -335,16 +358,26 @@ function resetEffect(player, property, defaultValue) {
 // Function to handle player movement
 function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
     if (player && player.active) {
+        // Reset horizontal velocity at the start
         player.setVelocityX(0);
 
+        // Move player left or right based on key presses
         if (leftKey.isDown) {
-            player.setVelocityX(-100 * player.speedMultiplier); // Use speedMultiplier
-        } else if (rightKey.isDown) {
-            player.setVelocityX(100 * player.speedMultiplier); // Use speedMultiplier
+            player.setVelocityX(-100 * player.speedMultiplier); // Move left with speed multiplier
         }
+        if (rightKey.isDown) {
+            player.setVelocityX(100 * player.speedMultiplier); // Move right with speed multiplier
+        }
+
+        // Allow player to jump if they are on the ground
         if (jumpKey.isDown && player.body.blocked.down) {
-            player.setVelocityY(-player.jumpHeight); // Use modified jumpHeight
+            
+            player.setVelocityY(-player.jumpHeight); // Jump with modified jump height
+             // Play the jump sound effect
         }
+
+
+
 
         ensureSpriteVisibility(player);
     }
@@ -353,52 +386,50 @@ function manageAttacks() {
     // Regular attack for Player 1 (SPACE key)
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 pressed 'SPACE' for regular attack!");
         if (player1Mana >= 20) {
             player1Mana -= 20;
             drawManaBar(player1ManaBar, player1Mana); // Update mana bar
-            console.log("Player 1 activating regular attack!");
+            this.gameSounds.regularAttack.play(); // Play regular attack sound
             activateHitbox.call(this, player1, player2, 10);
         } else {
             console.log("Player 1 doesn't have enough mana for regular attack!");
         }
     }
 
-    // Regular attack for Player 2 (Down arrow key)
-    if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
-        lastPlayer2AttackTime = this.time.now;
-        console.log("Player 2 pressed 'DOWN' for regular attack!");
-        if (player2Mana >= 20) {
-            player2Mana -= 20;
-            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
-            console.log("Player 2 activating regular attack!");
-            activateHitbox.call(this, player2, player1, 10);
-        } else {
-            console.log("Player 2 doesn't have enough mana for regular attack!");
-        }
-    }
     // Super punch attack for Player 1 (S key)
     if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 pressed 'S' for super punch!");
         if (player1Mana >= 50) {
             player1Mana -= 50;
             drawManaBar(player1ManaBar, player1Mana); // Update mana bar
-            console.log("Player 1 activating super punch!");
+            this.gameSounds.superAttack.play(); // Play super punch sound
             activateSuperPunch.call(this, player1, player2);
         } else {
             console.log("Player 1 doesn't have enough mana for super punch!");
         }
     }
 
-    // Super punch attack for Player 2 (1 key)
-    if (Phaser.Input.Keyboard.JustDown(keys.ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+    // Similar implementation for Player 2
+    // Regular attack for Player 2 (Down arrow key)
+    if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
-        console.log("Player 2 pressed '1' for super punch!");
+        if (player2Mana >= 20) {
+            player2Mana -= 20;
+            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+            this.gameSounds.regularAttack.play(); // Play regular attack sound
+            activateHitbox.call(this, player2, player1, 10);
+        } else {
+            console.log("Player 2 doesn't have enough mana for regular attack!");
+        }
+    }
+
+    // Super punch attack for Player 2 (1 key)
+ if (Phaser.Input.Keyboard.JustDown(keys.NUMPAD_ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+        lastPlayer2AttackTime = this.time.now;
         if (player2Mana >= 50) {
             player2Mana -= 50;
             drawManaBar(player2ManaBar, player2Mana); // Update mana bar
-            console.log("Player 2 activating super punch!");
+            this.gameSounds.superAttack.play(); // Play super punch sound
             activateSuperPunch.call(this, player2, player1);
         } else {
             console.log("Player 2 doesn't have enough mana for super punch!");
@@ -433,15 +464,32 @@ function activateHitbox(attacker, target, baseDamage) {
 
 
 function activateSuperPunch(attacker, target) {
-    console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
-    activateHitbox.call(this, attacker, target, 25);
+    // Calculate the distance between the attacker and the target
+    const distance = Phaser.Math.Distance.Between(attacker.x, attacker.y, target.x, target.y);
+    const attackRange = 200; // Define the range within which the super punch is effective
 
-    // Apply a strong horizontal force with little to no vertical movement
-    if (target.active) {
-        const direction = attacker.x < target.x ? 1 : -1;
-        target.setVelocityX(2000 * direction); // Very strong horizontal pushback
-        target.setVelocityY(-100); // Slight vertical lift to give a feeling of impact
-        console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and sent flying across the screen!`);
+    console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
+
+    // Check if the target is within the super punch range
+    if (distance <= attackRange) {
+        const hitbox = this.physics.add.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null).setSize(40, 40).setVisible(false).setActive(true);
+        this.physics.add.overlap(hitbox, target, () => {
+            const damage = 25 * attacker.damageMultiplier; // Calculate damage with multiplier
+            handlePlayerHit(attacker, target, hitbox, damage);
+            
+            // Apply a strong horizontal force based on the direction the attacker is facing
+            const direction = attacker.x < target.x ? 1 : -1;
+            target.setVelocityX(-2000 * direction); // Significant horizontal push
+            target.setVelocityY(0); // No vertical movement, focusing on horizontal impact
+
+        }, null, this);
+        
+        // Ensure the hitbox is removed shortly after activation
+        this.time.delayedCall(100, () => {
+            hitbox.destroy();
+        }, [], this);
+    } else {
+        console.log(`Super punch missed due to distance. Distance was ${distance}, required ${attackRange}.`);
     }
 }
 function handlePlayerHit(attacker, target, hitbox, damage) {
