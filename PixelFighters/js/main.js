@@ -93,6 +93,15 @@ class MainGame extends Phaser.Scene {
 		this.load.image("extra-mana", "assets/sprites/extra-mana.png");
 		this.load.image("health-potion", "assets/sprites/health-potion.png");
 
+
+    this.load.spritesheet('player1', `assets/sprites/${this.player1Character}.png`, {
+        frameWidth: 70, // Assuming 70px width as per the Wolverine sprite sheet details
+        frameHeight: 60, // Assuming 60px height as per the Wolverine sprite sheet details
+    });
+    this.load.spritesheet('player2', `assets/sprites/${this.player2Character}.png`, {
+        frameWidth: 70,
+        frameHeight: 60,
+    });
 		// Load tiles and other assets
 		for (let i = 1; i <= 75; i++) {
 			const tileId = `tile_${String(i).padStart(4, "0")}`;
@@ -113,6 +122,79 @@ class MainGame extends Phaser.Scene {
 		// Add and scale the background
 		const background = this.add.image(256, 240, "background");
 		background.setScale(4);
+
+    // Create animations for player1
+    this.anims.create({
+        key: 'player1-idle',
+        frames: this.anims.generateFrameNumbers('player1', { start: 0, end: 7 }), // Adjust frame range as necessary
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player1-move',
+        frames: this.anims.generateFrameNumbers('player1', { start: 8, end: 15 }), // Adjust frame range as necessary
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player1-jump',
+        frames: this.anims.generateFrameNumbers('player1', { start: 16, end: 23 }), // Adjust frame range as necessary
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player1-regular-attack',
+        frames: this.anims.generateFrameNumbers('player1', { start: 24, end: 31 }), // Adjust frame range as necessary
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player1-super-attack',
+        frames: this.anims.generateFrameNumbers('player1', { start: 32, end: 47 }), // Adjust frame range as necessary
+        frameRate: 10,
+        repeat: -1
+    });
+
+    // Create animations for player2 using the same logic
+    this.anims.create({
+        key: 'player2-idle',
+        frames: this.anims.generateFrameNumbers('player2', { start: 0, end: 7 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player2-move',
+        frames: this.anims.generateFrameNumbers('player2', { start: 8, end: 15 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player2-jump',
+        frames: this.anims.generateFrameNumbers('player2', { start: 16, end: 23 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player2-regular-attack',
+        frames: this.anims.generateFrameNumbers('player2', { start: 24, end: 31 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'player2-super-attack',
+        frames: this.anims.generateFrameNumbers('player2', { start: 32, end: 47 }),
+        frameRate: 10,
+        repeat: -1
+    });
+
 
 		const platforms = this.physics.add.staticGroup();
 // Define sounds for regular and super attacks
@@ -190,6 +272,9 @@ drawManaBar(player2ManaBar, player2Mana);
 		player2.speedMultiplier = 1;
 		player2.setGravityY(-300);
 
+
+    player1.play('player1-idle');
+    player2.play('player2-idle');
 		// Add collision between players and platforms, traps, and lava
 		this.physics.add.collider(player1, platforms);
 		this.physics.add.collider(player2, platforms);
@@ -373,73 +458,73 @@ function resetEffect(player, property, defaultValue) {
 
 // Function to handle player movement
 function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
-	if (player && player.active) {
-		player.setVelocityX(0);
+    if (player && player.active) {
+        player.setVelocityX(0);
 
-		if (leftKey.isDown) {
-			player.setVelocityX(-100 * player.speedMultiplier); // Use speedMultiplier
-		} else if (rightKey.isDown) {
-			player.setVelocityX(100 * player.speedMultiplier); // Use speedMultiplier
-		}
-		if (jumpKey.isDown && player.body.blocked.down) {
-			player.setVelocityY(-player.jumpHeight); // Use modified jumpHeight
-		}
+        if (leftKey.isDown) {
+            player.setVelocityX(-100 * player.speedMultiplier);
+            player.play(`${player.texture.key}-move`, true);
+            player.flipX = true;  // Flip sprite to face left
+        } else if (rightKey.isDown) {
+            player.setVelocityX(100 * player.speedMultiplier);
+            player.play(`${player.texture.key}-move`, true);
+            player.flipX = false;  // Face right
+        } else {
+            player.play(`${player.texture.key}-idle`, true);
+        }
+        
+        if (jumpKey.isDown && player.body.blocked.down) {
+            player.setVelocityY(-player.jumpHeight);
+            player.play(`${player.texture.key}-jump`, true);
+            this.gameSounds.jump.play();
+        }
 
-		ensureSpriteVisibility(player);
-	}
+        ensureSpriteVisibility(player);
+    }
 }
-
 function manageAttacks() {
-    // Regular attack for Player 1 (SPACE key)
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
         if (player1Mana >= 20) {
             player1Mana -= 20;
-            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
-            this.gameSounds.regularAttack.play(); // Play regular attack sound
+            drawManaBar(player1ManaBar, player1Mana);
+            this.gameSounds.regularAttack.play();
+            player1.play('player1-regular-attack', true);
             activateHitbox.call(this, player1, player2, 10);
-        } else {
-            console.log("Player 1 doesn't have enough mana for regular attack!");
         }
     }
 
-    // Super punch attack for Player 1 (S key)
     if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
         if (player1Mana >= 50) {
             player1Mana -= 50;
-            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
-            this.gameSounds.superAttack.play(); // Play super punch sound
+            drawManaBar(player1ManaBar, player1Mana);
+            this.gameSounds.superAttack.play();
+            player1.play('player1-super-attack', true);
             activateSuperPunch.call(this, player1, player2);
-        } else {
-            console.log("Player 1 doesn't have enough mana for super punch!");
         }
     }
 
-    // Similar implementation for Player 2
-    // Regular attack for Player 2 (Down arrow key)
+    // Implement similar logic for player2's attacks
     if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
         if (player2Mana >= 20) {
             player2Mana -= 20;
-            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
-            this.gameSounds.regularAttack.play(); // Play regular attack sound
+            drawManaBar(player2ManaBar, player2Mana);
+            this.gameSounds.regularAttack.play();
+            player2.play('player2-regular-attack', true);
             activateHitbox.call(this, player2, player1, 10);
-        } else {
-            console.log("Player 2 doesn't have enough mana for regular attack!");
         }
     }
 
-    // Super punch attack for Player 2 (NUMPAD_ONE key)
     if (Phaser.Input.Keyboard.JustDown(keys.NUMPAD_ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
         if (player2Mana >= 50) {
             player2Mana -= 50;
-            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
-            this.gameSounds.superAttack.play(); // Play super punch sound
+            drawManaBar(player2ManaBar, player2Mana);
+            this.gameSounds.superAttack.play();
+            player2.play('player2-super-attack', true);
             activateSuperPunch.call(this, player2, player1);
-        } else {
-            console.log("Player 2 doesn't have enough mana for super punch!");
         }
     }
 }
