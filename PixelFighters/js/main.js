@@ -111,22 +111,20 @@ function getRandomTile() {
 platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
 
 // Intermediate Platforms (Left and Right Sides)
-platforms.create(128, 400, getRandomTile()).setScale(3, 1).refreshBody(); // Left middle platform
-platforms.create(384, 400, getRandomTile()).setScale(3, 1).refreshBody(); // Right middle platform
+platforms.create(130, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
+platforms.create(380, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
 
 // Smaller Platforms above Intermediate Level
-platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
-platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
+platforms.create(250, 300, getRandomTile()).setScale(10, 1).refreshBody(); // Right upper middle platform
 
 // Upper Platforms - High-Level for Aerial Combat
 platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
 platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
-platforms.create(192, 220, getRandomTile()).setScale(3, 1).refreshBody(); // Left floating platform
-platforms.create(320, 220, getRandomTile()).setScale(3, 1).refreshBody(); // Right floating platform
-platforms.create(256, 170, getRandomTile()).setScale(4, 1).refreshBody(); // Central high platform
+platforms.create(334, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+platforms.create(160, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
 
 // Super Jump Platforms at the Bottom Left and Right
-const leftSuperJump = platforms.create(64, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+const leftSuperJump = platforms.create(64, 464, getRandomTile()).setScale(3, 1).refreshBody(); // Left super jump platform
 const rightSuperJump = platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
 
 // Lava Pit at the Bottom
@@ -135,18 +133,11 @@ lava.create(256, 478, 'lava').setScale(32, 0.5).refreshBody(); // Cover the bott
 
 // Traps Around Platforms
 const traps = this.physics.add.group();
-traps.create(192, 360, 'spikes').setScale(0.25).refreshBody(); // Trap on left middle platform
 
-traps.create(384, 250, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
-
-
+traps.create(380, 250, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
 
 // Additional Traps on Various Platforms
-traps.create(100, 430, 'trap').setScale(0.25).refreshBody(); // Trap on platform 1
-traps.create(200, 430, 'spikes').setScale(0.25).refreshBody();
-traps.create(400, 350, 'spikes').setScale(0.25).refreshBody();
-
-traps.create(150, 200, 'spikes').setScale(0.25).refreshBody();
+traps.create(130, 300, 'trap').setScale(0.25).refreshBody(); // Trap on left lower platform
 
 
 /////////////////////////////////////// END OF  MAP /////////////////////////////////////////////////
@@ -257,11 +248,41 @@ function hitLava(player, lava) {
 }
 
 function hitTrap(player, trap) {
-    if (!gameOver) {
-        console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap at (${trap.x}, ${trap.y}). Instant Game Over.`);
-        endGame.call(this, player === player1 ? 'Player 2' : 'Player 1');
+    if (!player.trapContact) {
+        player.trapContact = true;
+
+        // Disable player movement for 1.5 seconds
+        player.setVelocityX(0);
+        player.setVelocityY(0);
+        player.body.moves = false;
+
+        this.time.delayedCall(700, () => {
+            player.body.moves = true;
+            player.trapContact = false;
+            console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
+        }, [], this);
+
+        console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap and is immobilized.`);
+
+        // Make the trap disappear and respawn after 2 seconds
+        trap.setActive(false).setVisible(false);
+
+        this.time.delayedCall(2000, () => {
+            respawnTrap(trap, this);
+        }, [], this);
     }
 }
+
+function respawnTrap(trap, scene) {
+    // Randomly select new position for the trap
+    const newX = Phaser.Math.Between(50, config.width - 50);
+    const newY = Phaser.Math.Between(50, config.height - 150);
+
+    trap.setPosition(newX, newY);
+    trap.setActive(true).setVisible(true);
+    console.log('Trap has respawned at a new location.');
+}
+
 
 // Function to draw the health bar
 function drawHealthBar(graphics, health) {
@@ -314,17 +335,17 @@ function collectItem(player, item) {
         case 'touch-of-death':
             player.damageMultiplier *= 2.5;
             console.log(`Damage Multiplier Updated to: ${player.damageMultiplier}`);
-            this.time.delayedCall(15000, () => resetEffect(player, 'damageMultiplier', 1), [], this);
+            this.time.delayedCall(20000, () => resetEffect(player, 'damageMultiplier', 1), [], this);
             break;
         case 'speed-boost':
             player.speedMultiplier = (player.speedMultiplier || 1) * 2; // Ensure multiplier exists.
             console.log(`Speed Multiplier Updated to: ${player.speedMultiplier}`);
-            this.time.delayedCall(15000, () => resetEffect(player, 'speedMultiplier', 1), [], this);
+            this.time.delayedCall(10000, () => resetEffect(player, 'speedMultiplier', 1), [], this);
             break;
         case 'super-jump':
             player.jumpHeight *= 3;
             console.log(`Jump Height Updated to: ${player.jumpHeight}`);
-            this.time.delayedCall(15000, () => resetEffect(player, 'jumpHeight', 200), [], this);
+            this.time.delayedCall(10000, () => resetEffect(player, 'jumpHeight', 200), [], this);
             break;
         case 'extra-mana':
             player.mana = Math.min(player.mana + 20, 150);
