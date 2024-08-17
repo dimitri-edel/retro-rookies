@@ -1,0 +1,67 @@
+body {
+    margin: 0;
+    padding: 0;
+    /* background-color: #000; */
+    /* color: #00FF00; */ /* Changed to green for better visibility */
+    /* font-family: 'Press Start 2P', cursive;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; */
+
+    background: linear-gradient(135deg, #3A1078, #4E31AA, #3795BD, #F7F7F8); 
+    color: #2e2e2e; 
+    display: flex;
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    height: 100vh; 
+    text-align: center;
+}
+
+#game-container {
+    position: relative;
+    display: inline-block;
+}
+
+canvas {
+    border: 2px solid #fff;
+    image-rendering: pixelated;
+    width: 512px;
+    height: 480px;
+}
+
+.health-text {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-size: 16px;
+    color: #00FF00; /* Changed to green for better visibility */
+}
+
+/* Style the back button container */
+.back-btn {
+    margin-bottom: 20px; 
+}
+
+/* Style the back button */
+.button {
+    font-family: "Pixelify Sans", sans-serif;
+    background-color: #4E31AA; 
+    color: #F7F7F8; 
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.button:hover {
+    background-color: #2a1b76; /* Slightly lighter color on hover */
+    transform: scale(1.05); /* Slightly scale up on hover */
+}
+
+.button:active {
+    transform: scale(1); /* Reset scale on active */
+}
