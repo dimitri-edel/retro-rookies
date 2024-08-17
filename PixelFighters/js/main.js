@@ -38,6 +38,7 @@ function preload() {
     // Load background image and player sprites
     this.load.image('background', 'assets/sprites/background.png');
     this.load.image('background2', 'assets/sprites/background2.png'); // Load background for second map
+    this.load.audio('background3', 'assets/music/background.mp3'); // Load background music
 
     this.load.spritesheet('player1', 'assets/sprites/player1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('player2', 'assets/sprites/player2.png', { frameWidth: 32, frameHeight: 32 });
@@ -73,11 +74,20 @@ function create() {
     // Add and scale the background
     const background = this.add.image(256, 240, 'background');
     background.setScale(4);
+    // Play background music
+    const backgroundMusic = this.sound.add('background3', {
+        volume: 0.1, // Set volume to a reasonable level
+        loop: true   // Loop the background music
+    });
+    backgroundMusic.play();
+
 ///// Sounnd effects 
 
     const regularAttackSound = this.sound.add('regular-attack', { rate: 2 }); // Double the playback rate
     const superAttackSound = this.sound.add('super-attack', { rate: 2 }); // Double the playback rate
-    const jumpSound = this.sound.add('jump', { rate: 2 }); // Double the playback rate
+    const jumpSound = this.sound.add('jump', {
+        volume: 0.8,
+    }); // Double the playback rate
     this.gameSounds = {
         regularAttack: regularAttackSound,
         superAttack: superAttackSound,
@@ -307,8 +317,8 @@ function update() {
     // Debug player status
 
     // Validate players before trying to update their positions
-    handlePlayerMovement(player1, keys.A, keys.D, keys.W);
-    handlePlayerMovement(player2, cursors.left, cursors.right, cursors.up);
+    handlePlayerMovement.call(this, player1, keys.A, keys.D, keys.W);
+    handlePlayerMovement.call(this, player2, cursors.left, cursors.right, cursors.up);
 
     // Manage attacks for both players
     manageAttacks.call(this);
@@ -395,6 +405,7 @@ function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
             
             player.setVelocityY(-player.jumpHeight); // Jump with modified jump height
              // Play the jump sound effect
+            this.gameSounds.jump.play();
         }
 
 
