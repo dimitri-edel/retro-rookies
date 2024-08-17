@@ -183,10 +183,10 @@ traps.create(150, 200, 'spikes').setScale(0.25).refreshBody();
         loop: true
     });
 
-    // Power-up spawning event
+   
 // Power-up spawning event
 this.time.addEvent({
-    delay: 12000,
+    delay: 6000,
     callback: function () {
         const items = {
             'pack-a-punch': 0xff0000,
@@ -202,6 +202,7 @@ this.time.addEvent({
         item.setVelocityY(50);
         item.body.gravity.y = 20;
         item.setData('key', selectedItemKey);
+        item.setScale(0.25);
 
         // Ensure that items collide with platforms and disappear if not collected in 10 seconds
         this.physics.add.collider(item, platforms);
@@ -303,12 +304,12 @@ function collectItem(player, item) {
             this.time.delayedCall(15000, () => resetEffect(player, 'jumpHeight', 200), [], this);
             break;
         case 'extra-mana':
-            player.mana = Math.min(player.mana + 50, 150);
+            player.mana = Math.min(player.mana + 20, 150);
             console.log(`Mana Updated to: ${player.mana}`);
             // No need to reset mana after 15 seconds
             break;
         case 'health-potion':
-            player.health = Math.min(player.health + 50, player.maxHealth || 100); // Assume maxHealth if not set.
+            player.health = Math.min(player.health + 20, player.maxHealth || 100); // Assume maxHealth if not set.
             console.log(`Health Updated to: ${player.health}`);
             // No need to reset health after 15 seconds
             break;
@@ -374,6 +375,19 @@ function manageAttacks() {
             activateHitbox.call(this, player2, player1, 10);
         } else {
             console.log("Player 2 doesn't have enough mana for regular attack!");
+        }
+    }
+    // Super punch attack for Player 1 (S key)
+    if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
+        lastPlayer1AttackTime = this.time.now;
+        console.log("Player 1 pressed 'S' for super punch!");
+        if (player1Mana >= 50) {
+            player1Mana -= 50;
+            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+            console.log("Player 1 activating super punch!");
+            activateSuperPunch.call(this, player1, player2);
+        } else {
+            console.log("Player 1 doesn't have enough mana for super punch!");
         }
     }
 
