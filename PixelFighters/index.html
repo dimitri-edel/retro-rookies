@@ -1,21 +1,104 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pixel Fighters</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.js"></script>
-</head>
-<body>
+    <style>
+        body,
+        html {
+            height: 100%;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #121111;
+            font-family: 'Press Start 2P', cursive;
+           
+        }
 
-    
-    <!-- Link to test.html -->
-    <div id="links">
-        <a href="test.html" target="_blank">View Sprite Sheet Test</a>
-    </div>
-    
-    <script src="js/utils.js"></script>
-    <script src="js/main.js"></script>
+        #gameboy {
+            background-color: #C4C4C4;
+            width: 82vmin;
+            height: auto;
+            /* Allow height to adjust based on content */
+            border-radius: 15px;
+            box-shadow: 0020pxrgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 50px;
+            padding-left: 30px;
+            padding-right: 30px;
+            padding-bottom: 70px;
+            position: relative;
+            border: 4px solid #888888;
+        }
+
+        .screen-wrapper {
+            position: relative;
+            width: 100%;
+            height: auto;
+            background-color: #9bc3a8;
+            border-radius: 5px;
+            border: 5px solid #3e3e3e;
+            
+            overflow: hidden;
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+        }
+
+        #game-container {
+            width: 512px;
+            /* Fixed size for the game container */
+            height: 480px;
+            /* Fixed size for the game container */
+            background-color: #000;
+            border: 2px solid #000;
+            /* Add a border to keep it neat */
+        }
+
+
+
+        .label {
+            position: absolute;
+            top: 2%;
+            left: 5%;
+            font-size: 1.2vmin;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="gameboy">
+        <div class="label">Nintendo</div>
+        <div class="label" style="left: 60%;">Game Boy</div>
+        <div class="screen-wrapper">
+            <div id="game-container"></div>
+        </div>
+
+        <div class="row d-flex justify-content-center align-items-center w-100">
+            <div class="col-6">
+
+                <button class="btn-primary"></button>
+
+               
+            
+                 
+                    
+               
+            </div>
+            <div class="col-6">
+            </div>
+        </div>
+        <script src="js/utils.js"></script>
+        <script src="js/main.js"></script>
 </body>
+
 </html>

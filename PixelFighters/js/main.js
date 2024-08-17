@@ -24,14 +24,21 @@ let player1, player2;
 let cursors, keys;
 let player1Health = 100, player2Health = 100;
 let player1Mana = 100, player2Mana = 100;
-let player1HealthText, player2HealthText, player1ManaText, player2ManaText;
+
 let gameOver = false;
 let lastPlayer1AttackTime = 0, lastPlayer2AttackTime = 0;
 let attackDelay = 500; // Delay in milliseconds
 
+// Declare health and mana bars globally
+let player1HealthBar, player2HealthBar;
+let player1ManaBar, player2ManaBar;
+
 function preload() {
+   
     // Load background image and player sprites
-    this.load.image('background', 'assets/sprites/background.jpg');
+    this.load.image('background', 'assets/sprites/background.png');
+    this.load.image('background2', 'assets/sprites/background2.png'); // Load background for second map
+
     this.load.spritesheet('player1', 'assets/sprites/player1.png', { frameWidth: 32, frameHeight: 32 });
     this.load.spritesheet('player2', 'assets/sprites/player2.png', { frameWidth: 32, frameHeight: 32 });
 
@@ -42,6 +49,9 @@ function preload() {
     this.load.image('super-jump', 'assets/sprites/super-jump.png');
     this.load.image('extra-mana', 'assets/sprites/extra-mana.png');
     this.load.image('health-potion', 'assets/sprites/health-potion.png');
+    this.load.audio('regular-attack', 'assets/sounds/regular-attack.mp3');
+    this.load.audio('super-attack', 'assets/sounds/super-attack.mp3');
+    this.load.audio('jump', 'assets/sounds/jump.mp3');
 
     // Load tiles
     for (let i = 1; i <= 75; i++) {
@@ -53,67 +63,97 @@ function preload() {
     this.load.image('lava', 'assets/fire.png'); // Lava
     this.load.image('spikes', 'assets/spikes.png'); // Falling traps
     this.load.image('trap', 'assets/trap.png'); // Set traps
+
+
 }
+
+
+
 function create() {
     // Add and scale the background
     const background = this.add.image(256, 240, 'background');
     background.setScale(4);
+///// Sounnd effects 
 
-    // Create an empty static group for platforms
-    const platforms = this.physics.add.staticGroup();
+    const regularAttackSound = this.sound.add('regular-attack', { rate: 2 }); // Double the playback rate
+    const superAttackSound = this.sound.add('super-attack', { rate: 2 }); // Double the playback rate
+    const jumpSound = this.sound.add('jump', { rate: 2 }); // Double the playback rate
+    this.gameSounds = {
+        regularAttack: regularAttackSound,
+        superAttack: superAttackSound,
+        jump: jumpSound // Initialize the jump sound
+    };
+    
+// Player 1 Health and Mana Bars
+    // Initialize player health and mana bars
+    player1HealthBar = this.add.graphics({ x: 10, y: 10 });
+    player1ManaBar = this.add.graphics({ x: 10, y: 30 });
 
-    // Create base platform and other platforms with more density
-    platforms.create(256, 464, 'tile_0020').setScale(12, 1).refreshBody(); // Base platform
-    platforms.create(256, 400, 'tile_0020').setScale(6, 1).refreshBody(); // Platform 1
-    platforms.create(128, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 2
-    platforms.create(384, 350, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 3
-    platforms.create(256, 300, 'tile_0020').setScale(4, 1).refreshBody(); // Platform 4
-    platforms.create(64, 260, 'tile_0020').setScale(2, 1).refreshBody();  // Platform 5
-    platforms.create(448, 260, 'tile_0020').setScale(2, 1).refreshBody(); // Platform 6
-    platforms.create(192, 220, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 7
-    platforms.create(320, 220, 'tile_0020').setScale(3, 1).refreshBody(); // Platform 8
+    player2HealthBar = this.add.graphics({ x: 400, y: 10 });
+    player2ManaBar = this.add.graphics({ x: 400, y: 30 });
 
-    // Create scattered smaller platforms and tiles
-    platforms.create(256, 170, 'tile_0030').setScale(2, 1).refreshBody();
-    platforms.create(128, 120, 'tile_0030').setScale(1.5, 1).refreshBody();
-    platforms.create(384, 120, 'tile_0030').setScale(1.5, 1).refreshBody();
+    // Draw initial bars
+    drawHealthBar(player1HealthBar, player1Health);
+    drawManaBar(player1ManaBar, player1Mana);
 
-    // Scatter random tiles for a varied look
-    platforms.create(100, 350, 'tile_0010').refreshBody();
-    platforms.create(420, 380, 'tile_0015').refreshBody();
-    platforms.create(370, 240, 'tile_0018').refreshBody();
-    platforms.create(150, 240, 'tile_0012').refreshBody();
-    platforms.create(300, 180, 'tile_0025').refreshBody();
-    platforms.create(350, 140, 'tile_0035').refreshBody();
-    platforms.create(200, 100, 'tile_0040').refreshBody();
+    drawHealthBar(player2HealthBar, player2Health);
+    drawManaBar(player2ManaBar, player2Mana);
+/////////////////////////////////////// EDITING THE MAP /////////////////////////////////////////////////
+const platforms = this.physics.add.staticGroup();
 
-    // Add super jump platforms at the bottom left and right
-    const leftSuperJump = platforms.create(64, 464, 'tile_0020').setScale(2, 1).refreshBody();
-    const rightSuperJump = platforms.create(448, 464, 'tile_0020').setScale(2, 1).refreshBody();
+// Function to get a random tile
+function getRandomTile() {
+    const randomIndex = Phaser.Math.Between(1, 75); // Random number between 1 and 75
+    return `tile_${String(randomIndex).padStart(4, '0')}`;
+}
 
-    // Add lava at the bottom of the map
-    const lava = this.physics.add.staticGroup();
-    lava.create(256, 478, 'lava').setScale(32, 0.5).refreshBody(); // Cover the bottom with lava
+// Base Level - Main Battleground
+platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
 
-    // Add traps around platforms and create falling traps
-    const traps = this.physics.add.group();
-    traps.create(100, 430, 'trap').setScale(0.5).refreshBody(); // Static trap on platform 1
-    traps.create(300, 260, 'trap').setScale(0.5).refreshBody(); // Static trap on platform 5
-    traps.create(250, 0, 'trap').setScale(0.5).setVelocityY(200); // Falling trap
+// Intermediate Platforms (Left and Right Sides)
+platforms.create(128, 400, getRandomTile()).setScale(3, 1).refreshBody(); // Left middle platform
+platforms.create(384, 400, getRandomTile()).setScale(3, 1).refreshBody(); // Right middle platform
 
-    // Additional traps around platforms
-    traps.create(200, 430, 'spikes').setScale(0.5).refreshBody();
-    traps.create(400, 350, 'spikes').setScale(0.5).refreshBody();
-    traps.create(300, 400, 'spikes').setScale(0.5).refreshBody();
-    traps.create(150, 200, 'spikes').setScale(0.5).refreshBody();
+// Smaller Platforms above Intermediate Level
+platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
+platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
 
+// Upper Platforms - High-Level for Aerial Combat
+platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+platforms.create(192, 220, getRandomTile()).setScale(3, 1).refreshBody(); // Left floating platform
+platforms.create(320, 220, getRandomTile()).setScale(3, 1).refreshBody(); // Right floating platform
+platforms.create(256, 170, getRandomTile()).setScale(4, 1).refreshBody(); // Central high platform
+
+// Super Jump Platforms at the Bottom Left and Right
+const leftSuperJump = platforms.create(64, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+const rightSuperJump = platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+
+// Lava Pit at the Bottom
+const lava = this.physics.add.staticGroup();
+lava.create(256, 478, 'lava').setScale(32, 0.5).refreshBody(); // Cover the bottom with lava
+
+// Traps Around Platforms
+const traps = this.physics.add.group();
+traps.create(192, 360, 'spikes').setScale(0.25).refreshBody(); // Trap on left middle platform
+
+traps.create(384, 250, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
+
+
+
+// Additional Traps on Various Platforms
+traps.create(100, 430, 'trap').setScale(0.25).refreshBody(); // Trap on platform 1
+traps.create(200, 430, 'spikes').setScale(0.25).refreshBody();
+traps.create(400, 350, 'spikes').setScale(0.25).refreshBody();
+
+traps.create(150, 200, 'spikes').setScale(0.25).refreshBody();
+
+
+/////////////////////////////////////// END OF  MAP /////////////////////////////////////////////////
     // Initialize player health and mana text displays
-    player1HealthText = createText(this, 10, 10, 'Health: ' + player1Health);
-    player2HealthText = createText(this, 400, 10, 'Health: ' + player2Health);
-    player1ManaText = createText(this, 10, 30, 'Mana: ' + player1Mana);
-    player2ManaText = createText(this, 400, 30, 'Mana: ' + player2Mana);
 
-    // Create player sprites with physics
+
+    // Create player sprites with physicswd
     player1 = this.physics.add.sprite(50, 400, 'player1');
     player2 = this.physics.add.sprite(450, 400, 'player2');
 
@@ -148,8 +188,15 @@ function create() {
 
 
     // Set up input controls
-    cursors = this.input.keyboard.createCursorKeys();
-    keys = this.input.keyboard.addKeys('W,A,S,D,SPACE,ONE');
+cursors = this.input.keyboard.createCursorKeys();
+keys = this.input.keyboard.addKeys({
+    'W': Phaser.Input.Keyboard.KeyCodes.W,
+    'A': Phaser.Input.Keyboard.KeyCodes.A,
+    'S': Phaser.Input.Keyboard.KeyCodes.S,
+    'D': Phaser.Input.Keyboard.KeyCodes.D,
+    'SPACE': Phaser.Input.Keyboard.KeyCodes.SPACE,
+    'NUMPAD_ONE': Phaser.Input.Keyboard.KeyCodes.NUMPAD_ONE  // Use this key code for Player 2's super punch
+});
 
     // Mana regeneration event
     this.time.addEvent({
@@ -159,34 +206,42 @@ function create() {
         loop: true
     });
 
-    // Power-up spawning event
-    this.time.addEvent({
-        delay: 12000,
-        callback: function () {
-            const items = {
-                'pack-a-punch': 0xff0000,
-                'touch-of-death': 0x00ff00,
-                'speed-boost': 0x0000ff,
-                'super-jump': 0xffff00,
-                'extra-mana': 0xff00ff,
-                'health-potion': 0x00ffff
-            };
-            const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
-            const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItemKey);
-            item.setTint(items[selectedItemKey]);
-            item.setVelocityY(50);
-            item.body.gravity.y = 20;
-            item.setData('key', selectedItemKey);
+   
+// Power-up spawning event
+this.time.addEvent({
+    delay: 6000,
+    callback: function () {
+        const items = {
+            'pack-a-punch': 0xff0000,
+            'touch-of-death': 0x00ff00,
+            'speed-boost': 0x0000ff,
+            'super-jump': 0xffff00,
+            'extra-mana': 0xff00ff,
+            'health-potion': 0x00ffff
+        };
+        const selectedItemKey = Phaser.Math.RND.pick(Object.keys(items));
+        const item = this.physics.add.sprite(Phaser.Math.Between(0, config.width), 0, selectedItemKey);
+        item.setTint(items[selectedItemKey]);
+        item.setVelocityY(50);
+        item.body.gravity.y = 20;
+        item.setData('key', selectedItemKey);
+        item.setScale(0.25);
 
-            // Ensure that items collide with platforms
-            this.physics.add.collider(item, platforms);
+        // Ensure that items collide with platforms and disappear if not collected in 10 seconds
+        this.physics.add.collider(item, platforms);
+        this.physics.add.overlap(player1, item, collectItem, null, this);
+        this.physics.add.overlap(player2, item, collectItem, null, this);
 
-            this.physics.add.overlap(player1, item, collectItem, null, this);
-            this.physics.add.overlap(player2, item, collectItem, null, this);
-        },
-        callbackScope: this,
-        loop: true
-    });
+        // Set a timeout to destroy the item if not collected
+        this.time.delayedCall(10000, () => {
+            if (item && item.active) {
+                item.destroy(); // Destroy the item if still present after 10 seconds
+            }
+        });
+    },
+    callbackScope: this,
+    loop: true
+});
 
     // Adjust camera settings
     this.cameras.main.setBounds(0, 0, 512, 480);
@@ -208,7 +263,23 @@ function hitTrap(player, trap) {
     }
 }
 
+// Function to draw the health bar
+function drawHealthBar(graphics, health) {
+    graphics.clear();
+    graphics.fillStyle(0xff0000, 1); // Red color for health
+    graphics.fillRect(0, 0, health, 10); // Draw health bar based on health value
+    graphics.lineStyle(2, 0x000000, 1); // Black outline for better visibility
+    graphics.strokeRect(0, 0, 100, 10); // Fixed size outline for the health bar
+}
 
+// Function to draw the mana bar
+function drawManaBar(graphics, mana) {
+    graphics.clear();
+    graphics.fillStyle(0x0000ff, 1); // Blue color for mana
+    graphics.fillRect(0, 0, mana, 10); // Draw mana bar based on mana value
+    graphics.lineStyle(2, 0x000000, 1); // Black outline for better visibility
+    graphics.strokeRect(0, 0, 100, 10); // Fixed size outline for the mana bar
+}
 
 function update() {
     if (gameOver) return;
@@ -256,12 +327,12 @@ function collectItem(player, item) {
             this.time.delayedCall(15000, () => resetEffect(player, 'jumpHeight', 200), [], this);
             break;
         case 'extra-mana':
-            player.mana = Math.min(player.mana + 50, 150);
+            player.mana = Math.min(player.mana + 20, 150);
             console.log(`Mana Updated to: ${player.mana}`);
             // No need to reset mana after 15 seconds
             break;
         case 'health-potion':
-            player.health = Math.min(player.health + 50, player.maxHealth || 100); // Assume maxHealth if not set.
+            player.health = Math.min(player.health + 20, player.maxHealth || 100); // Assume maxHealth if not set.
             console.log(`Health Updated to: ${player.health}`);
             // No need to reset health after 15 seconds
             break;
@@ -287,78 +358,86 @@ function resetEffect(player, property, defaultValue) {
 // Function to handle player movement
 function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
     if (player && player.active) {
+        // Reset horizontal velocity at the start
         player.setVelocityX(0);
 
+        // Move player left or right based on key presses
         if (leftKey.isDown) {
-            player.setVelocityX(-100 * player.speedMultiplier); // Use speedMultiplier
-        } else if (rightKey.isDown) {
-            player.setVelocityX(100 * player.speedMultiplier); // Use speedMultiplier
+            player.setVelocityX(-100 * player.speedMultiplier); // Move left with speed multiplier
         }
+        if (rightKey.isDown) {
+            player.setVelocityX(100 * player.speedMultiplier); // Move right with speed multiplier
+        }
+
+        // Allow player to jump if they are on the ground
         if (jumpKey.isDown && player.body.blocked.down) {
-            player.setVelocityY(-player.jumpHeight); // Use modified jumpHeight
+            
+            player.setVelocityY(-player.jumpHeight); // Jump with modified jump height
+             // Play the jump sound effect
         }
+
+
+
 
         ensureSpriteVisibility(player);
     }
 }
-
 function manageAttacks() {
     // Regular attack for Player 1 (SPACE key)
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 pressed 'SPACE' for regular attack!");
         if (player1Mana >= 20) {
             player1Mana -= 20;
-            updateManaText(player1ManaText, player1Mana);
-            console.log("Player 1 activating regular attack!");
+            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+            this.gameSounds.regularAttack.play(); // Play regular attack sound
             activateHitbox.call(this, player1, player2, 10);
         } else {
             console.log("Player 1 doesn't have enough mana for regular attack!");
         }
     }
 
-    // Regular attack for Player 2 (Down arrow key)
-    if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
-        lastPlayer2AttackTime = this.time.now;
-        console.log("Player 2 pressed 'DOWN' for regular attack!");
-        if (player2Mana >= 20) {
-            player2Mana -= 20;
-            updateManaText(player2ManaText, player2Mana);
-            console.log("Player 2 activating regular attack!");
-            activateHitbox.call(this, player2, player1, 10);
-        } else {
-            console.log("Player 2 doesn't have enough mana for regular attack!");
-        }
-    }
-
     // Super punch attack for Player 1 (S key)
     if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
-        console.log("Player 1 pressed 'S' for super punch!");
         if (player1Mana >= 50) {
             player1Mana -= 50;
-            updateManaText(player1ManaText, player1Mana);
-            console.log("Player 1 activating super punch!");
+            drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+            this.gameSounds.superAttack.play(); // Play super punch sound
             activateSuperPunch.call(this, player1, player2);
         } else {
             console.log("Player 1 doesn't have enough mana for super punch!");
         }
     }
 
-    // Super punch attack for Player 2 (1 key)
-    if (Phaser.Input.Keyboard.JustDown(keys.ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+    // Similar implementation for Player 2
+    // Regular attack for Player 2 (Down arrow key)
+    if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
-        console.log("Player 2 pressed '1' for super punch!");
+        if (player2Mana >= 20) {
+            player2Mana -= 20;
+            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+            this.gameSounds.regularAttack.play(); // Play regular attack sound
+            activateHitbox.call(this, player2, player1, 10);
+        } else {
+            console.log("Player 2 doesn't have enough mana for regular attack!");
+        }
+    }
+
+    // Super punch attack for Player 2 (1 key)
+ if (Phaser.Input.Keyboard.JustDown(keys.NUMPAD_ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+        lastPlayer2AttackTime = this.time.now;
         if (player2Mana >= 50) {
             player2Mana -= 50;
-            updateManaText(player2ManaText, player2Mana);
-            console.log("Player 2 activating super punch!");
+            drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+            this.gameSounds.superAttack.play(); // Play super punch sound
             activateSuperPunch.call(this, player2, player1);
         } else {
             console.log("Player 2 doesn't have enough mana for super punch!");
         }
     }
 }
+
+
 
 // Function to activate hitbox for regular and super punch attacks
 // Function to activate hitbox for regular and super punch attacks
@@ -385,28 +464,44 @@ function activateHitbox(attacker, target, baseDamage) {
 
 
 function activateSuperPunch(attacker, target) {
-    console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
-    activateHitbox.call(this, attacker, target, 25);
+    // Calculate the distance between the attacker and the target
+    const distance = Phaser.Math.Distance.Between(attacker.x, attacker.y, target.x, target.y);
+    const attackRange = 200; // Define the range within which the super punch is effective
 
-    // Apply a strong horizontal force with little to no vertical movement
-    if (target.active) {
-        const direction = attacker.x < target.x ? 1 : -1;
-        target.setVelocityX(2000 * direction); // Very strong horizontal pushback
-        target.setVelocityY(-100); // Slight vertical lift to give a feeling of impact
-        console.log(`${target === player1 ? 'Player 1' : 'Player 2'} is hit and sent flying across the screen!`);
+    console.log(`Activating super punch for ${attacker === player1 ? 'Player 1' : 'Player 2'}`);
+
+    // Check if the target is within the super punch range
+    if (distance <= attackRange) {
+        const hitbox = this.physics.add.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null).setSize(40, 40).setVisible(false).setActive(true);
+        this.physics.add.overlap(hitbox, target, () => {
+            const damage = 25 * attacker.damageMultiplier; // Calculate damage with multiplier
+            handlePlayerHit(attacker, target, hitbox, damage);
+            
+            // Apply a strong horizontal force based on the direction the attacker is facing
+            const direction = attacker.x < target.x ? 1 : -1;
+            target.setVelocityX(-2000 * direction); // Significant horizontal push
+            target.setVelocityY(0); // No vertical movement, focusing on horizontal impact
+
+        }, null, this);
+        
+        // Ensure the hitbox is removed shortly after activation
+        this.time.delayedCall(100, () => {
+            hitbox.destroy();
+        }, [], this);
+    } else {
+        console.log(`Super punch missed due to distance. Distance was ${distance}, required ${attackRange}.`);
     }
 }
-
 function handlePlayerHit(attacker, target, hitbox, damage) {
     if (hitbox.active && target.active && !target.body.immovable) {
         if (target === player1) {
             player1Health -= damage;
             console.log(`Player 1 hit! Health reduced by ${damage}. Current Health: ${player1Health}`);
-            updateHealthText(player1HealthText, player1Health);
+            drawHealthBar(player1HealthBar, player1Health); // Update health bar
         } else if (target === player2) {
             player2Health -= damage;
             console.log(`Player 2 hit! Health reduced by ${damage}. Current Health: ${player2Health}`);
-            updateHealthText(player2HealthText, player2Health);
+            drawHealthBar(player2HealthBar, player2Health); // Update health bar
         }
 
         // Deactivate the hitbox after a successful hit
@@ -423,6 +518,7 @@ function handlePlayerHit(attacker, target, hitbox, damage) {
         }
     }
 }
+
 
 function deactivateHitbox(hitbox) {
     if (hitbox && hitbox.active) {
@@ -466,27 +562,18 @@ function createText(scene, x, y, text) {
 }
 
 // Update the health text display when a player's health changes
-function updateHealthText(healthText, health) {
-    healthText.setText('Health: ' + health);
-    console.log(`Health updated: ${healthText.text}`);
-}
 
-// Update the mana text display when a player's mana changes
-function updateManaText(manaText, mana) {
-    manaText.setText('Mana: ' + mana);
-    console.log(`Mana updated: ${manaText.text}`);
-}
 
 // Recharge mana for both players every 5 seconds
 function rechargeMana() {
     if (player1Mana < 100) {
         player1Mana = Math.min(player1Mana + 20, 100);
-        updateManaText(player1ManaText, player1Mana);
+        drawManaBar(player1ManaBar, player1Mana); // Update mana bar
         console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
     }
     if (player2Mana < 100) {
         player2Mana = Math.min(player2Mana + 20, 100);
-        updateManaText(player2ManaText, player2Mana);
+        drawManaBar(player2ManaBar, player2Mana); // Update mana bar
         console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
     }
 }
@@ -510,3 +597,7 @@ function endGame(winner) {
 
     console.log(gameOverText.text);  // Ensure the text is created correctly
 }
+
+
+
+
