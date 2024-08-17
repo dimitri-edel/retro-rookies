@@ -1,0 +1,6 @@
+source: https://www.deviantart.com
+frame width: 50px
+frame height 60px
+total rows: 8
+total columns: 6
+total Frames: 48
