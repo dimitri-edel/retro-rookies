@@ -19,9 +19,27 @@ body {
     text-align: center;
 }
 
+.logo_img {
+    width: 20% !important;
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+
+.github_logo {
+    width: 2% !important;
+    height: auto;
+    margin-bottom: 10px;
+}
+
 #game-container {
-    position: relative;
-    display: inline-block;
+    width: 712px;
+    /* Fixed size for the game container */
+    height: 480px;
+    /* Fixed size for the game container */
+    background-color: #000;
+    border: 2px solid #000;
+    /* Add a border to keep it neat */
 }
 
 canvas {
@@ -65,3 +83,38 @@ canvas {
 .button:active {
     transform: scale(1); /* Reset scale on active */
 }
+
+/* Use a media query to add a breakpoint at 360px: for the game.html to reduce size button */
+@media screen and (max-width: 360px) {
+    .button {
+        font-size: 1em;
+        padding: 8px
+    }
+    .logo_img {
+        width: 30% !important;
+    }
+
+    .github_logo {
+        width: 10% !important;
+        height: auto;
+        margin-bottom: 10px;
+    }
+}   
+
+footer {
+    bottom: 0 !important;
+    border-top: rgb(231, 38, 173) solid 3px;
+    position: fixed;
+    text-align: center;
+    width: 100%;
+}
+
+ /* Use a media query to add a breakpoint at 650px to make increased github images */
+ @media screen and (max-width: 650px) {
+    .github_logo {
+        width: 6% !important;
+        height: auto;
+        margin-bottom: 10px;
+    }
+}   
+
