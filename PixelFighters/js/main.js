@@ -5,9 +5,11 @@ class CharacterSelectionScene extends Phaser.Scene {
 	}
 
 	preload() {
-		// Load character thumbnails or icons
-		this.load.image('player1', 'assets/sprites/player1.png');
-		this.load.image('player2', 'assets/sprites/player2.png');
+		this.load.spritesheet('terminator-select', 'assets/terminator-select.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 100,          // Height of each frame
+		});
+
 		this.load.spritesheet('wolverine', 'assets/wolverine-spritesheet.png', {
 			frameWidth: 70,  // Adjust the frameWidth to the actual width of each frame
 			frameHeight: 60,  // Adjust the frameHeight to the actual height of each frame
@@ -40,18 +42,15 @@ class CharacterSelectionScene extends Phaser.Scene {
 		}).setOrigin(0.5);
 
 		// Display character options
-		// Display character options
-		const character1 = this.add.image(100, 150, 'player1').setInteractive();
-		const character2 = this.add.image(250, 150, 'player2').setInteractive();
+		const character1 = this.add.sprite(100, 150, 'terminator-select', 0).setInteractive(); // Wolverine's first frame as a selection thumbnail
 		const character3 = this.add.sprite(400, 150, 'wolverine', 0).setInteractive(); // Wolverine's first frame as a selection thumbnail
 		const character4 = this.add.sprite(100, 250, 'trunks-select', 0).setInteractive(); // Trunks' first frame as a selection thumbnail
 		const character5 = this.add.sprite(250, 250, 'vegeta-select', 0).setInteractive(); // Vegeta's first frame as a selection thumbnail
 		const character6 = this.add.sprite(400, 250, 'sasuke-select', 0).setInteractive();
 		const character7 = this.add.sprite(100, 350, 'batman-select', 5).setInteractive(); // Batman's super attack frame 5 as a selection thumbnail
 
-		// Adjust the hitboxes to match the visual elements
+		// Scale the character options
 		character1.setDisplaySize(100, 100);
-		character2.setDisplaySize(100, 100);
 		character3.setDisplaySize(100, 100);
 		character4.setDisplaySize(100, 100);
 		character5.setDisplaySize(100, 100);
@@ -114,7 +113,51 @@ class MainGame extends Phaser.Scene {
 		// Load assets based on selected characters
 		this.load.image("background", "assets/sprites/background.png");
 
-		// Load the images you manually cropped
+
+		// Load the spritesheets for the selected characters
+		// Terminator spritesheets
+		// Sequence of terminator walking left
+		this.load.spritesheet('terminator-walk-left', 'assets/sprites/terminator-walk-left.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator walking right
+		this.load.spritesheet('terminator-walk-right', 'assets/sprites/terminator-walk-right.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator jumping right
+		this.load.spritesheet('terminator-jump-right', 'assets/sprites/terminator-jump-right.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator jumping left
+		this.load.spritesheet('terminator-jump-left', 'assets/sprites/terminator-jump-left.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator attacking right
+		this.load.spritesheet('terminator-attack-right', 'assets/sprites/terminator-attack-right.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator attacking left
+		this.load.spritesheet('terminator-attack-left', 'assets/sprites/terminator-attack-left.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator super attacking right
+		this.load.spritesheet('terminator-super-attack-right', 'assets/sprites/terminator-super-attack-right.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator super attacking left
+		this.load.spritesheet('terminator-super-attack-left', 'assets/sprites/terminator-super-attack-left.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+
+
 		this.load.spritesheet('wolverine-left', 'assets/wolverine-left.png', {
 			frameWidth: 50.6,
 			frameHeight: 42,
@@ -266,6 +309,82 @@ class MainGame extends Phaser.Scene {
 		const basicAttackFrameRate = 20 / attackDuration; // Assuming 4 frames for basic attack
 		const superAttackFrameRate = 20 / attackDuration;
 
+		// Create animations for the terminator
+		// Terminator walking right
+		this.anims.create({
+			key: 'terminator-walk-right',
+			frames: this.anims.generateFrameNumbers('terminator-walk-right', { start: 0, end: 4 }), // Adjust frame numbers
+			frameRate: 15, // Faster frame rate for walking
+			repeat: -1 // Loop indefinitely
+		});
+		// Terminator walking left
+		this.anims.create({
+			key: 'terminator-walk-left',
+			frames: this.anims.generateFrameNumbers('terminator-walk-left', { start: 0, end: 4 }), // Adjust frame numbers
+			frameRate: 15, // Faster frame rate for walking
+			repeat: -1 // Loop indefinitely
+		});
+		// Terminator is idle left
+		this.anims.create({
+			key: 'terminator-idle-left',
+			frames: [{ key: 'terminator-walk-left', frame: 0 }], // Choose a single frame for idle
+			frameRate: 1, // Very slow or no repeat
+			repeat: 0
+		});
+		// Terminator is idle right
+		this.anims.create({
+			key: 'terminator-idle-right',
+			frames: [{ key: 'terminator-walk-right', frame: 0 }], // Choose a single frame for idle
+			frameRate: 1, // Very slow or no repeat
+			repeat: 0
+		});
+
+
+		// Terminator jumping right
+		this.anims.create({
+			key: 'terminator-jump-right',
+			frames: [{ key: 'terminator-jump-right', frame: 0 }], // Single frame for jumping
+			frameRate: 10,
+			repeat: 0
+		});
+		// Terminator jumping left
+		this.anims.create({
+			key: 'terminator-jump-left',
+			frames: [{ key: 'terminator-jump-left', frame: 0 }], // Single frame for jumping
+			frameRate: 10,
+			repeat: 0
+		});
+
+		// Terminator basic attack right
+		this.anims.create({
+			key: 'terminator-attack-right',
+			frames: this.anims.generateFrameNumbers('terminator-attack-right', { start: 0, end: 4 }), // 4 frames
+			frameRate: basicAttackFrameRate,
+			repeat: 0
+		});
+		// Terminator basic attack left
+		this.anims.create({
+			key: 'terminator-attack-left',
+			frames: this.anims.generateFrameNumbers('terminator-attack-left', { start: 0, end: 4 }), // 4 frames
+			frameRate: basicAttackFrameRate,
+			repeat: 0
+		});
+		// Terminator super attack right
+		this.anims.create({
+			key: 'terminator-super-attack-right',
+			frames: this.anims.generateFrameNumbers('terminator-super-attack-right', { start: 0, end: 4 }), // 5 frames
+			frameRate: superAttackFrameRate,
+			repeat: 0
+		});
+		// Terminator super attack left
+		this.anims.create({
+			key: 'terminator-super-attack-left',
+			frames: this.anims.generateFrameNumbers('terminator-super-attack-left', { start: 0, end: 4 }), // 5 frames
+			frameRate: superAttackFrameRate,
+			repeat: 0
+		});
+
+
 		// Create animations for Wolverine
 		// Create Wolverine animations
 		this.anims.create({
@@ -275,21 +394,7 @@ class MainGame extends Phaser.Scene {
 			repeat: -1 // Loop indefinitely
 		});
 
-		// Create the player1-idle animation using Wolverine's first frame
-		this.anims.create({
-			key: 'player1-idle',
-			frames: [{ key: 'wolverine-left', frame: 0 }], // First frame of the wolverine-left spritesheet
-			frameRate: 1,
-			repeat: -1
-		});
 
-		// Create the player1-idle animation using Wolverine's first frame
-		this.anims.create({
-			key: 'player2-idle',
-			frames: [{ key: 'wolverine-left', frame: 0 }], // First frame of the wolverine-left spritesheet
-			frameRate: 1,
-			repeat: -1
-		});
 
 		this.anims.create({
 			key: 'wolverine-jump',
@@ -548,12 +653,21 @@ class MainGame extends Phaser.Scene {
 			repeat: -1
 		});
 
+
+
 		// Create player sprites based on selection
 		if (this.player1Character === 'vegeta-select') {
 			player1 = this.physics.add.sprite(50, 400, 'vegeta-move-left');
 			player1.play('vegeta-idle-right');
 			player1.flipX = false; // Ensure Player 1 faces right
-		} else if (this.player1Character === 'wolverine') {
+		} else if (this.player1Character === 'terminator-select') {
+			player1 = this.physics.add.sprite(50, 400, 'terminator-idle-right').setScale(0.5);
+			player1.play('terminator-idle-right');
+			// Since some sprites need scaling , set size for player 1
+			player1.setSize(50, 110);
+			player1.flipX = false; // Ensure Player 1 faces right
+		}
+		else if (this.player1Character === 'wolverine') {
 			player1 = this.physics.add.sprite(50, 400, 'wolverine-left');
 			player1.play('wolverine-idle-right');
 			player1.flipX = false; // Ensure Player 1 faces right
@@ -575,11 +689,17 @@ class MainGame extends Phaser.Scene {
 			player1.flipX = false; // Ensure Player 1 faces right
 		}
 
+
 		if (this.player2Character === 'vegeta-select') {
 			player2 = this.physics.add.sprite(450, 400, 'vegeta-move-left');
 			player2.play('vegeta-idle-left');
 			player2.flipX = true; // Ensure Player 2 faces left
-		} else if (this.player2Character === 'wolverine') {
+		} else if (this.player2Character === 'terminator-select') {
+			player2 = this.physics.add.sprite(450, 400, 'terminator-idle-right');
+			player2.play('terminator-idle-right');
+			player2.flipX = true; // Ensure Player 2 faces left
+		}
+		else if (this.player2Character === 'wolverine') {
 			player2 = this.physics.add.sprite(450, 400, 'wolverine-left');
 			player2.play('wolverine-idle-left');
 			player2.flipX = true; // Ensure Player 2 faces left
@@ -936,7 +1056,11 @@ function handlePlayerMovement(player, controls) {
 	if (controls.jump.isDown && player.body.blocked.down) {
 		player.setVelocityY(-player.jumpHeight);
 		player.state = 'jumping';
-		playAnimation(player, 'jump');
+		if (player.flipX === true) {
+			playAnimation(player, 'jump-left');
+		} else {
+			playAnimation(player, 'jump-right');
+		}
 	} else if (player.state === 'jumping' && player.body.blocked.down) {
 		// Transition from jumping to idle or move based on input
 		player.state = 'idle';
@@ -949,6 +1073,7 @@ function handlePlayerMovement(player, controls) {
 		if (player.state !== 'jumping') {
 			player.state = 'moving';
 			playAnimation(player, 'move-left');
+			player.flipX = true;
 		}
 		player.flipX = true;
 	} else if (controls.right.isDown) {
@@ -956,6 +1081,7 @@ function handlePlayerMovement(player, controls) {
 		if (player.state !== 'jumping') {
 			player.state = 'moving';
 			playAnimation(player, 'move-right');
+			player.flipX = false;
 		}
 		player.flipX = false;
 	} else if (player.body.blocked.down && player.state !== 'jumping') {
@@ -971,33 +1097,47 @@ function handlePlayerMovement(player, controls) {
 }
 
 function playAnimation(player, action) {
+	console.log("Player animation: " + action);
+
 	const characterAnimations = {
+		'terminator': {
+			'jump-right': 'terminator-jump-right',
+			'jump-left': 'terminator-jump-left',
+			'move-left': 'terminator-walk-left',
+			'move-right': 'terminator-walk-right',
+			'idle': 'terminator-idle-right'
+		},
 		'wolverine': {
-			'jump': 'wolverine-jump',
+			'jump-right': 'wolverine-jump',
+			'jump-left': 'wolverine-jump',
 			'move-left': 'wolverine-move-right',
 			'move-right': 'wolverine-move-right',
 			'idle': 'wolverine-idle-right'
 		},
 		'trunks': {
-			'jump': 'trunks-jump-right',
+			'jump-right': 'trunks-jump-right',
+			'jump-left': 'trunks-jump-right',
 			'move-left': 'trunks-move-left',
 			'move-right': 'trunks-move-right',
 			'idle': 'trunks-idle-right'
 		},
 		'vegeta': {
-			'jump': 'vegeta-jump',
+			'jump-right': 'vegeta-jump',
+			'jump-left': 'vegeta-jump',
 			'move-left': 'vegeta-move-left',
 			'move-right': 'vegeta-move-left',
 			'idle': 'vegeta-idle-right'
 		},
 		'sasuke': {
-			'jump': 'sasuke-jump',
+			'jump-right': 'sasuke-jump',
+			'jump-left': 'sasuke-jump',
 			'move-left': 'sasuke-move-left',
 			'move-right': 'sasuke-move-left',
 			'idle': 'sasuke-idle'
 		},
 		'batman': {
-			'jump': 'batman-jump',
+			'jump-right': 'batman-jump',
+			'jump-left': 'batman-jump',
 			'move-left': 'batman-move-left',
 			'move-right': 'batman-move-left', // Batman only has left animations, so reuse them
 			'idle': 'batman-idle'
@@ -1008,9 +1148,12 @@ function playAnimation(player, action) {
 	const animKey = player.texture.key.includes('wolverine') ? 'wolverine' :
 		player.texture.key.includes('trunks') ? 'trunks' :
 			player.texture.key.includes('sasuke') ? 'sasuke' :
-				player.texture.key.includes('batman') ? 'batman' : 'vegeta';
+				player.texture.key.includes('batman') ? 'batman' :
+					player.texture.key.includes('terminator') ? 'terminator' : 'vegeta';
 
 	const animation = characterAnimations[animKey][action];
+	// Play the animation
+	console.log("Player animation: " + animation);
 	player.play(animation, true);
 
 	// Ensure correct flipping for left movement
@@ -1047,6 +1190,10 @@ function manageAttacks() {
 function handleAttack(attacker, target, type) {
 	const attackCosts = { 'regular': 20, 'super': 50 };
 	const animations = {
+		'terminator': {
+			'regular': attacker.flipX ? 'terminator-attack-left' : 'terminator-attack-right',
+			'super': attacker.flipX ? 'terminator-super-attack-left' : 'terminator-super-attack-right'
+		},
 		'wolverine': {
 			'regular': attacker.flipX ? 'wolverine-basic-attack-left' : 'wolverine-basic-attack-right',
 			'super': attacker.flipX ? 'wolverine-super-attack-left' : 'wolverine-super-attack-right'
@@ -1072,7 +1219,8 @@ function handleAttack(attacker, target, type) {
 	const animKey = attacker.texture.key.includes('wolverine') ? 'wolverine' :
 		attacker.texture.key.includes('trunks') ? 'trunks' :
 			attacker.texture.key.includes('sasuke') ? 'sasuke' :
-				attacker.texture.key.includes('batman') ? 'batman' : 'vegeta';
+				attacker.texture.key.includes('batman') ? 'batman' : 
+					attacker.texture.key.includes('terminator') ? 'terminator' : 'vegeta';						
 
 	const animation = animations[animKey][type];
 	const manaCost = attackCosts[type];
