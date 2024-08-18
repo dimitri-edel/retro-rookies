@@ -1228,7 +1228,7 @@ function drawManaBar(graphics, mana) {
 // Recharge mana for both players every 5 seconds
 function rechargeMana() {
    if (player1Mana < 100) {
-        player1Mana = Math.min(player1Mana + 20, 100);
+        player1Mana = Math.min(player1Mana + 30, 100);
         drawManaBar(player1ManaBar, player1Mana); // Update mana bar
         console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
     }
