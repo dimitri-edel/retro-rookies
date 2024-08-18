@@ -22,6 +22,7 @@ function handleButtonClick(url) {
 }
 
 // Add event listeners to the buttons
-startButton.addEventListener('click', handleButtonClick('index.html'));
+startButton.addEventListener('click', handleButtonClick('game.html'));
 howToPlayButton.addEventListener('click', handleButtonClick('how-to-play.html'));
 aboutButton.addEventListener('click', handleButtonClick('about.html'));
+

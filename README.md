@@ -1,4 +1,6 @@
 # Pixel Fighters: August 2024 Hackathon
+ <img src="PixelFighters/assets/ReadMe_images/Hacathon team 4 mockup responsive screen.png" alt="Mockup responsive screen">
+
 Visit the deployed site: []
 - - - 
 ## Overview
@@ -48,9 +50,43 @@ Simply open `index.html` in a web browser to play the game.
 
 ## Design
 
+### Logo Design
+- The two logos design are idea for the game name and our team logo. 
+  1. The logo game design as pixel font and marvel characters to display on the each pages
+    -  <img src="PixelFighters/assets/Logo/Logo_1.png" alt="Design logo called Throwback with pixel fonts and side of the marvel characters">
+  2. Our team logo design, it design the logo with image of network which the way we are network through Github team to work together. Our called name "Retro Rookies"
+    -  <img src="PixelFighters/assets/Logo/Repro Rookie Logo_1.png" alt="Design logo called Retro Rookies with image of netwrok with system" style="width:600px">
+
 ### Wireframes
+- The wireframe are draft idea for the Throwback game pages. Please see atached images to click drowdown to see image.
+* 
+  <details>
+    <summary>Home page</summary>
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe1.jpg" alt="Wifreframe home page">
+  </details>
+
+* 
+  <details>
+    <summary>Game page</summary>
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe3.jpg" alt="Wifreframe Game page">
+  </details>
+
+* 
+  <details>
+    <summary>How to play page</summary>
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe2.jpg" alt="Wifreframe How to play page">
+  </details>
+
+* 
+  <details>
+    <summary>About page</summary>
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe4.jpg" alt="Wifreframe About page">
+  </details>
+
 ### Colour scheme
 ### Font
+
+- I used font by google font, The font is [Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans?query=Pixel). It is all inclued pages. 
 
 ## Accessibility
 - The CSS framework Bootstrap is used to provide a responsive experience across devices of various sizes.  
@@ -64,10 +100,25 @@ Simply open `index.html` in a web browser to play the game.
 - CSS3
 - Javascript
 - [Phaser] (v3.80.1 "Nino")https://phaser.io/download/stable HTML5 Framework
-- [Bootstrap](Version 4.6) (https://getbootstrap.com/docs/4.6/getting-started/introduction/) CSS Framework
+- [Bootstrap](Version 5.0.2) (https://getbootstrap.com/docs/5.0/getting-started/introduction/) CSS Framework
+- Adobe Photoshop to create design logo and charachers by Robert Quinlan 
+
   ## Credits
   ## Media
   ### Images:
+   #### I used download images which used free licence as following below links:
+  - [Vecteezy](https://www.vecteezy.com/vector-art/45562049-affiliate-marketing-icon-design) to create logo for our team called "Retro Rookies".
+  - [Logo github](https://github.com/logos) to create logo on the footer pages which it includes link our team github's profile. 
+  - Three image of marval charachers as follow links below:
+    - [Blade characther](https://marvelsnapzone.com/variants/blade-01/)
+    - [Wolverine characher](https://ie.pinterest.com/pin/33214115995401644/)
+    - [Terminator characher](https://ie.pinterest.com/pin/671036413228810134/)
+  
+
+
+
+
+
   ### Sound Effects:
   Background music and sound effects downloaded from [Pixabay](https://pixabay.com/)
   ## Team
@@ -76,7 +127,7 @@ Simply open `index.html` in a web browser to play the game.
   - Maushum Gurrung [GitHub](https://www.github.com/grgmaushum)
   - Laura Masterton [GitHub](https://www.github.com/https://www.github.com/Laura-Masterton)
   - Jesse Lee Ross[GitHub](https://www.github.com/jesseross001)
-  - Robert Quinlan 
+  - Robert Quinlan[GitHub](https://github.com/RQISL)
   
 
 

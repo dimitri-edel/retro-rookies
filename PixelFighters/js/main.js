@@ -763,22 +763,16 @@ class MainGame extends Phaser.Scene {
 		lava.create(256, 478, "lava").setScale(32, 0.5).refreshBody();
 
 		const traps = this.physics.add.group();
-		traps.create(380, 250, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
+		traps.create(294, 180, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
 		traps.create(200, 430, "spikes").setScale(0.25).refreshBody();
-		traps.create(130, 290, 'trap').setScale(0.25).refreshBody(); // Trap on left lower platform
+		traps.create(190, 180, 'trap').setScale(0.25).refreshBody(); // Trap on left lower platform
 
 		// Initialize player health and mana text displays
 		player1HealthBar = this.add.graphics({ x: 10, y: 10 });
 		player1ManaBar = this.add.graphics({ x: 10, y: 30 });
 		player2HealthBar = this.add.graphics({ x: 400, y: 10 });
 		player2ManaBar = this.add.graphics({ x: 400, y: 30 });
-
-		this.time.addEvent({
-			delay: 5000, // 5 seconds
-			callback: rechargeMana,
-			callbackScope: this,
-			loop: true
-		});
+  
 		// Draw initial bars
 		drawHealthBar(player1HealthBar, player1Health);
 		drawManaBar(player1ManaBar, player1Mana);
@@ -791,14 +785,14 @@ class MainGame extends Phaser.Scene {
 		player1.setBounce(0.2);
 		player1.setCollideWorldBounds(true);
 		player1.damageMultiplier = 1;
-		player1.jumpHeight = 250;
+		player1.jumpHeight = 260;
 		player1.speedMultiplier = 1;
 		player1.setGravityY(-300);
 
 		player2.setBounce(0.2);
 		player2.setCollideWorldBounds(true);
 		player2.damageMultiplier = 1;
-		player2.jumpHeight = 250;
+		player2.jumpHeight = 260;
 		player2.speedMultiplier = 1;
 		player2.setGravityY(-300);
 
@@ -904,41 +898,41 @@ function hitLava(player, lava) {
 	}
 }
 
-function hitTrap(player, trap) {
-	if (!player.trapContact) {
-		player.trapContact = true;
-
-		// Disable player movement for 1.5 seconds
-		player.setVelocityX(0);
-		player.setVelocityY(0);
-		player.body.moves = false;
-
-		this.time.delayedCall(1500, () => {
-			player.body.moves = true;
-			player.trapContact = false;
-			console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
-		}, [], this);
-
-		console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap and is immobilized.`);
-
-		// Make the trap disappear and respawn after 2 seconds
-		trap.setActive(false).setVisible(false);
-
-		this.time.delayedCall(2000, () => {
-			respawnTrap(trap, this);
-		}, [], this);
-	}
-}
-
-function respawnTrap(trap, scene) {
-	// Randomly select new position for the trap
-	const newX = Phaser.Math.Between(50, config.width - 50);
-	const newY = Phaser.Math.Between(50, config.height - 150);
-
-	trap.setPosition(newX, newY);
-	trap.setActive(true).setVisible(true);
-	console.log('Trap has respawned at a new location.');
-}
+    function hitTrap(player, trap) {
+        if (!player.trapContact) {
+            player.trapContact = true;
+    
+            // Disable player movement for 1.5 seconds
+            player.setVelocityX(0);
+            player.setVelocityY(0);
+            player.body.moves = false;
+    
+            this.time.delayedCall(1500, () => {
+                player.body.moves = true;
+                player.trapContact = false;
+                console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
+            }, [], this);
+    
+            console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap and is immobilized.`);
+    
+            // Make the trap disappear and respawn after 2 seconds
+            trap.setActive(false).setVisible(false);
+    
+            this.time.delayedCall(2000, () => {
+                respawnTrap(trap, this);
+            }, [], this);
+        }
+    }
+    
+    function respawnTrap(trap, scene) {
+        // Randomly select new position for the trap
+        const newX = Phaser.Math.Between(50, config.width - 50);
+        const newY = Phaser.Math.Between(50, config.height - 150);
+    
+        trap.setPosition(newX, newY);
+        trap.setActive(true).setVisible(true);
+        console.log('Trap has respawned at a new location.');
+    }
 
 
 function adjustDirectionBasedOnOpponent(player, opponent) {
@@ -1167,10 +1161,10 @@ function playAnimation(player, action) {
 
 
 function manageAttacks() {
-	if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
-		lastPlayer1AttackTime = this.time.now; // Update last attack time
-		handleAttack.call(this, player1, player2, 'regular');
-	}
+    if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
+        lastPlayer1AttackTime = this.time.now; // Update last attack time
+        handleAttack.call(this, player1, player2, 'regular');
+    }
 
 	if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
 		lastPlayer1AttackTime = this.time.now; // Update last attack time
@@ -1225,12 +1219,12 @@ function handleAttack(attacker, target, type) {
 	const animation = animations[animKey][type];
 	const manaCost = attackCosts[type];
 
-	if (attacker.mana >= manaCost) {
-		attacker.mana -= manaCost;
-
-		if (type === 'regular' || type === 'super') {
-			this.gameSounds[`${type}Attack`].play();
-			activateHitbox.call(this, attacker, target, type === 'regular' ? 10 : 25);
+    if (attacker.mana >= manaCost) {
+        attacker.mana -= manaCost;
+        
+        if (type === 'regular' || type === 'super') {
+            this.gameSounds[`${type}Attack`].play();
+            activateHitbox.call(this, attacker, target, type === 'regular' ? 10 : 25);
 
 			// Play the right-side attack first, then flip to left
 			attacker.play(animation, true).on('animationcomplete', () => {
@@ -1370,16 +1364,16 @@ function drawManaBar(graphics, mana) {
 
 // Recharge mana for both players every 5 seconds
 function rechargeMana() {
-	if (player1Mana < 100) {
-		player1Mana = Math.min(player1Mana + 20, 100);
-		drawManaBar(player1ManaBar, player1Mana);
-		console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
-	}
-	if (player2Mana < 100) {
-		player2Mana = Math.min(player2Mana + 20, 100);
-		drawManaBar(player2ManaBar, player2Mana);
-		console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
-	}
+   if (player1Mana < 100) {
+        player1Mana = Math.min(player1Mana + 30, 100);
+        drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+        console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
+    }
+    if (player2Mana < 100) {
+        player2Mana = Math.min(player2Mana + 20, 100);
+        drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+        console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
+    }
 }
 
 // End the game and declare a winner
