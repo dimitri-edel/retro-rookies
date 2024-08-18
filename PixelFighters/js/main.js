@@ -141,6 +141,12 @@ class MainGame extends Phaser.Scene {
 		const background = this.add.image(256, 240, "background");
 		background.setScale(4);
 
+        const attackDuration = 1; // 0.2 seconds for each attack animation
+
+        // Calculate frame rates based on the number of frames
+        const basicAttackFrameRate = 20 / attackDuration; // Assuming 4 frames for basic attack
+        const superAttackFrameRate = 20/ attackDuration; 
+
                // Create animations for Wolverine
       // Create Wolverine animations
     this.anims.create({
@@ -173,31 +179,31 @@ this.anims.create({
     repeat: 0
 });
 
-   this.anims.create({
+       this.anims.create({
             key: 'wolverine-basic-attack-right',
-            frames: this.anims.generateFrameNumbers('wolverine-attack', { start: 0, end: 4 }),
-            frameRate: 25,
+            frames: this.anims.generateFrameNumbers('wolverine-attack', { start: 0, end: 4 }), // 4 frames
+            frameRate: basicAttackFrameRate,
             repeat: 0
         });
 
         this.anims.create({
             key: 'wolverine-basic-attack-left',
-            frames: this.anims.generateFrameNumbers('wolverine-attack', { start: 0, end: 4 }),
-            frameRate: 25,
+            frames: this.anims.generateFrameNumbers('wolverine-attack', { start: 0, end: 4 }), // 4 frames
+            frameRate: basicAttackFrameRate,
             repeat: 0
         });
 
         this.anims.create({
             key: 'wolverine-super-attack-right',
-            frames: this.anims.generateFrameNumbers('wolverine-superattack', { start: 0, end: 4 }),
-            frameRate: 25,
+            frames: this.anims.generateFrameNumbers('wolverine-superattack', { start: 0, end: 4 }), // 5 frames
+            frameRate: superAttackFrameRate,
             repeat: 0
         });
 
         this.anims.create({
             key: 'wolverine-super-attack-left',
-            frames: this.anims.generateFrameNumbers('wolverine-superattack', { start: 0, end: 4 }),
-            frameRate: 25,
+            frames: this.anims.generateFrameNumbers('wolverine-superattack', { start: 0, end: 4 }), // 5 frames
+            frameRate: superAttackFrameRate,
             repeat: 0
         });
 
