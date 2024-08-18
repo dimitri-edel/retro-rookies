@@ -748,16 +748,20 @@ player2.mana = player2Mana;
 		this.cameras.main.startFollow(player1);
 	}
 
-	update() {
-		if (gameOver) return;
+update() {
+    if (gameOver) return;
 
-		// Handle player movement
-		handlePlayerMovement(player1, { jump: keys.W, left: keys.A, right: keys.D });
-		handlePlayerMovement(player2, { jump: cursors.up, left: cursors.left, right: cursors.right });
+    // Handle player movement
+    handlePlayerMovement(player1, { jump: keys.W, left: keys.A, right: keys.D });
+    handlePlayerMovement(player2, { jump: cursors.up, left: cursors.left, right: cursors.right });
 
-		// Manage attacks for both players
-		manageAttacks.call(this);
-	}  // <-- Ensure this closing brace is present
+    // Adjust facing direction based on the opponent's position
+    adjustDirectionBasedOnOpponent(player1, player2);
+    adjustDirectionBasedOnOpponent(player2, player1);
+
+    // Manage attacks for both players
+    manageAttacks.call(this);
+}
 }
 	function hitLava(player, lava) {
 		if (!gameOver) {
@@ -777,6 +781,33 @@ function hitTrap(player, trap) {
 	}
 }
 
+
+function adjustDirectionBasedOnOpponent(player, opponent) {
+    // Determine the character of the player
+    const isSpecialCharacter = player.texture.key.includes('sasuke') || 
+                               player.texture.key.includes('batman') || 
+                               player.texture.key.includes('wolverine');
+    
+    if (isSpecialCharacter) {
+        // For Sasuke, Batman, and Wolverine
+        if (player.x < opponent.x) {
+            // Face right
+            player.flipX = false;
+        } else {
+            // Face left
+            player.flipX = true;
+        }
+    } else {
+        // For all other characters
+        if (player.x < opponent.x) {
+            // Face right
+            player.flipX = true;
+        } else {
+            // Face left
+            player.flipX = false;
+        }
+    }
+}
 function collectItem(player, item) {
 	if (!item || !item.getData("key")) {
 		console.error("Item collection failed: item data is missing.");
