@@ -1,5 +1,4 @@
 
-// Rename the class
 class CharacterSelectionScene extends Phaser.Scene {
     constructor() {
         super({ key: 'CharacterSelectionScene' });
@@ -9,6 +8,10 @@ class CharacterSelectionScene extends Phaser.Scene {
         // Load character thumbnails or icons
         this.load.image('player1', 'assets/sprites/player1.png');
         this.load.image('player2', 'assets/sprites/player2.png');
+        this.load.spritesheet('wolverine','assets/wolverine-spritesheet.png', {
+            frameWidth: 70,  // Adjust the frameWidth to the actual width of each frame
+            frameHeight: 60,  // Adjust the frameHeight to the actual height of each frame
+        });
     }
 
     create() {
@@ -19,8 +22,14 @@ class CharacterSelectionScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Display character options
-        const character1 = this.add.image(150, 150, 'player1').setInteractive();
-        const character2 = this.add.image(362, 150, 'player2').setInteractive();
+        const character1 = this.add.image(100, 150, 'player1').setInteractive();
+        const character2 = this.add.image(250, 150, 'player2').setInteractive();
+        const character3 = this.add.sprite(400, 150, 'wolverine', 0).setInteractive(); // Wolverine's first frame as a selection thumbnail
+
+        // Adjust the hitboxes to match the visual elements
+        character1.setDisplaySize(100, 100);
+        character2.setDisplaySize(100, 100);
+        character3.setDisplaySize(100, 100);
 
         let player1Selected = null;
         let player2Selected = null;
@@ -29,7 +38,7 @@ class CharacterSelectionScene extends Phaser.Scene {
         this.input.on('gameobjectdown', (pointer, gameObject) => {
             if (!player1Selected) {
                 player1Selected = gameObject.texture.key;
-                this.add.text(150, 250, "Player 1 Selected", {
+                this.add.text(100, 250, "Player 1 Selected", {
                     fontFamily: 'Arial',
                     fontSize: '18px',
                     fill: 'white',
@@ -41,7 +50,7 @@ class CharacterSelectionScene extends Phaser.Scene {
                 }).setOrigin(0.5);
             } else if (!player2Selected) {
                 player2Selected = gameObject.texture.key;
-                this.add.text(362, 250, "Player 2 Selected", {
+                this.add.text(250, 250, "Player 2 Selected", {
                     fontFamily: 'Arial',
                     fontSize: '18px',
                     fill: 'white',
@@ -78,14 +87,30 @@ class MainGame extends Phaser.Scene {
 	preload() {
 		// Load assets based on selected characters
 		this.load.image("background", "assets/sprites/background.png");
-		this.load.spritesheet('player1', `assets/sprites/${this.player1Character}.png`, {
-			frameWidth: 32,
-			frameHeight: 32,
-		});
-		this.load.spritesheet('player2', `assets/sprites/${this.player2Character}.png`, {
-			frameWidth: 32,
-			frameHeight: 32,
-		});
+
+        // Load the images you manually cropped
+    this.load.spritesheet('wolverine-left', 'assets/wolverine-left.png', {
+        frameWidth: 66.6,
+        frameHeight: 42,
+    });
+
+    this.load.spritesheet('wolverine-jump', 'assets/jump.png', {
+        frameWidth: 71,
+        frameHeight: 61,
+    });
+
+    this.load.spritesheet('wolverine-attack', 'assets/wolverine-attack.png', {
+        frameWidth: 68.2,
+        frameHeight: 56,
+    });
+
+    this.load.spritesheet('wolverine-superattack', 'assets/wolverine-superattack.png', {
+        frameWidth: 70,
+        frameHeight: 61,
+    });
+
+		
+
 		this.load.image("pack-a-punch", "assets/sprites/pack-a-punch.png");
 		this.load.image("touch-of-death", "assets/sprites/touch-of-death.png");
 		this.load.image("speed-boost", "assets/sprites/speed-boost.png");
@@ -94,14 +119,7 @@ class MainGame extends Phaser.Scene {
 		this.load.image("health-potion", "assets/sprites/health-potion.png");
 
 
-    this.load.spritesheet('player1', `assets/sprites/${this.player1Character}.png`, {
-        frameWidth: 70, // Assuming 70px width as per the Wolverine sprite sheet details
-        frameHeight: 60, // Assuming 60px height as per the Wolverine sprite sheet details
-    });
-    this.load.spritesheet('player2', `assets/sprites/${this.player2Character}.png`, {
-        frameWidth: 70,
-        frameHeight: 60,
-    });
+    
 		// Load tiles and other assets
 		for (let i = 1; i <= 75; i++) {
 			const tileId = `tile_${String(i).padStart(4, "0")}`;
@@ -123,77 +141,97 @@ class MainGame extends Phaser.Scene {
 		const background = this.add.image(256, 240, "background");
 		background.setScale(4);
 
-    // Create animations for player1
+               // Create animations for Wolverine
+      // Create Wolverine animations
     this.anims.create({
-        key: 'player1-idle',
-        frames: this.anims.generateFrameNumbers('player1', { start: 0, end: 7 }), // Adjust frame range as necessary
-        frameRate: 10,
-        repeat: -1
-    });
+    key: 'wolverine-move-right',
+    frames: this.anims.generateFrameNumbers('wolverine-left', { start: 0, end: 4 }), // Adjust frame numbers
+    frameRate: 15, // Faster frame rate for walking
+    repeat: -1 // Loop indefinitely
+});
 
-    this.anims.create({
-        key: 'player1-move',
-        frames: this.anims.generateFrameNumbers('player1', { start: 8, end: 15 }), // Adjust frame range as necessary
-        frameRate: 10,
-        repeat: -1
-    });
+// Create the player1-idle animation using Wolverine's first frame
+this.anims.create({
+    key: 'player1-idle',
+    frames: [{ key: 'wolverine-left', frame: 0 }], // First frame of the wolverine-left spritesheet
+    frameRate: 1,
+    repeat: -1
+});
 
-    this.anims.create({
-        key: 'player1-jump',
-        frames: this.anims.generateFrameNumbers('player1', { start: 16, end: 23 }), // Adjust frame range as necessary
-        frameRate: 10,
-        repeat: -1
-    });
+// Create the player1-idle animation using Wolverine's first frame
+this.anims.create({
+    key: 'player2-idle',
+    frames: [{ key: 'wolverine-left', frame: 0 }], // First frame of the wolverine-left spritesheet
+    frameRate: 1,
+    repeat: -1
+});
 
-    this.anims.create({
-        key: 'player1-regular-attack',
-        frames: this.anims.generateFrameNumbers('player1', { start: 24, end: 31 }), // Adjust frame range as necessary
-        frameRate: 10,
-        repeat: -1
-    });
+this.anims.create({
+    key: 'wolverine-jump',
+    frames: [{ key: 'wolverine-jump', frame: 0 }], // Single frame for jumping
+    frameRate: 10,
+    repeat: 0
+});
 
-    this.anims.create({
-        key: 'player1-super-attack',
-        frames: this.anims.generateFrameNumbers('player1', { start: 32, end: 47 }), // Adjust frame range as necessary
-        frameRate: 10,
-        repeat: -1
-    });
+   this.anims.create({
+            key: 'wolverine-basic-attack-right',
+            frames: this.anims.generateFrameNumbers('wolverine-attack', { start: 0, end: 4 }),
+            frameRate: 25,
+            repeat: 0
+        });
 
-    // Create animations for player2 using the same logic
-    this.anims.create({
-        key: 'player2-idle',
-        frames: this.anims.generateFrameNumbers('player2', { start: 0, end: 7 }),
-        frameRate: 10,
-        repeat: -1
-    });
+        this.anims.create({
+            key: 'wolverine-basic-attack-left',
+            frames: this.anims.generateFrameNumbers('wolverine-attack', { start: 0, end: 4 }),
+            frameRate: 25,
+            repeat: 0
+        });
 
-    this.anims.create({
-        key: 'player2-move',
-        frames: this.anims.generateFrameNumbers('player2', { start: 8, end: 15 }),
-        frameRate: 10,
-        repeat: -1
-    });
+        this.anims.create({
+            key: 'wolverine-super-attack-right',
+            frames: this.anims.generateFrameNumbers('wolverine-superattack', { start: 0, end: 4 }),
+            frameRate: 25,
+            repeat: 0
+        });
 
-    this.anims.create({
-        key: 'player2-jump',
-        frames: this.anims.generateFrameNumbers('player2', { start: 16, end: 23 }),
-        frameRate: 10,
-        repeat: -1
-    });
+        this.anims.create({
+            key: 'wolverine-super-attack-left',
+            frames: this.anims.generateFrameNumbers('wolverine-superattack', { start: 0, end: 4 }),
+            frameRate: 25,
+            repeat: 0
+        });
 
-    this.anims.create({
-        key: 'player2-regular-attack',
-        frames: this.anims.generateFrameNumbers('player2', { start: 24, end: 31 }),
-        frameRate: 10,
-        repeat: -1
-    });
+this.anims.create({
+    key: 'wolverine-idle-right',
+    frames: [{ key: 'wolverine-left', frame: 0 }], // Choose a single frame for idle
+    frameRate: 1, // Very slow or no repeat
+    repeat: 0
+});
 
-    this.anims.create({
-        key: 'player2-super-attack',
-        frames: this.anims.generateFrameNumbers('player2', { start: 32, end: 47 }),
-        frameRate: 10,
-        repeat: -1
-    });
+this.anims.create({
+    key: 'wolverine-idle-left',
+    frames: [{ key: 'wolverine-left', frame: 0 }],
+    frameRate: 1,
+    repeat: 0
+});
+
+        // Create player sprites based on selection
+        if (this.player1Character === 'wolverine') {
+            player1 = this.physics.add.sprite(50, 400, 'wolverine-left');
+            player1.play('wolverine-left');
+        } else {
+            player1 = this.physics.add.sprite(50, 400, 'player1');
+            player1.play('player1-idle');
+        }
+
+        if (this.player2Character === 'wolverine') {
+            player2 = this.physics.add.sprite(450, 400, 'wolverine-left');
+            player2.play('wolverine-left');
+        } else {
+            player2 = this.physics.add.sprite(450, 400, 'player2');
+            player2.play('player2-idle');
+        }
+
 
 
 		const platforms = this.physics.add.staticGroup();
@@ -255,8 +293,7 @@ drawHealthBar(player2HealthBar, player2Health);
 drawManaBar(player2ManaBar, player2Mana);
 
 		// Create player sprites with physics
-		player1 = this.physics.add.sprite(50, 400, "player1");
-		player2 = this.physics.add.sprite(450, 400, "player2");
+
 
 		player1.setBounce(0.2);
 		player1.setCollideWorldBounds(true);
@@ -275,6 +312,17 @@ drawManaBar(player2ManaBar, player2Mana);
 
     player1.play('player1-idle');
     player2.play('player2-idle');
+        if (this.player1Character === 'wolverine') {
+            player1.play('wolverine-move-right');
+        } else {
+            player1.play('player1-idle');
+        }
+
+        if (this.player2Character === 'wolverine') {
+            player2.play('wolverine-move-left');
+        } else {
+            player2.play('player2-idle');
+        }
 		// Add collision between players and platforms, traps, and lava
 		this.physics.add.collider(player1, platforms);
 		this.physics.add.collider(player2, platforms);
@@ -462,34 +510,61 @@ function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
         player.setVelocityX(0);
 
         if (leftKey.isDown) {
-            player.setVelocityX(-100 * player.speedMultiplier);
-            player.play(`${player.texture.key}-move`, true);
+            player.setVelocityX(-150 * player.speedMultiplier);
+            if (player.texture.key === 'wolverine-left') {
+                player.play('wolverine-move-right', true);
+            } else {
+                player.play('player1-move', true); // Adjust this to your character animation
+            }
             player.flipX = true;  // Flip sprite to face left
         } else if (rightKey.isDown) {
-            player.setVelocityX(100 * player.speedMultiplier);
-            player.play(`${player.texture.key}-move`, true);
+            player.setVelocityX(150 * player.speedMultiplier);
+            if (player.texture.key === 'wolverine-left') {
+                player.play('wolverine-move-right', true);
+            } else {
+                player.play('player1-move', true);
+            }
             player.flipX = false;  // Face right
         } else {
-            player.play(`${player.texture.key}-idle`, true);
+            // Idle state
+            if (player.texture.key === 'wolverine-left') {
+                player.play(player.flipX ? 'wolverine-idle-left' : 'wolverine-idle-right', true);
+            } else {
+                player.play('player1-idle', true);
+            }
         }
-        
+
         if (jumpKey.isDown && player.body.blocked.down) {
             player.setVelocityY(-player.jumpHeight);
-            player.play(`${player.texture.key}-jump`, true);
-            this.gameSounds.jump.play();
+            if (player.texture.key === 'wolverine-left') {
+                player.play('wolverine-jump', true);
+            } else {
+                player.play('player1-jump', true);
+            }
         }
 
         ensureSpriteVisibility(player);
     }
 }
+
+// Function to manage player attacks
+// Function to manage player attacks
 function manageAttacks() {
+    // Handle Player 1 attacks
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now;
         if (player1Mana >= 20) {
             player1Mana -= 20;
             drawManaBar(player1ManaBar, player1Mana);
             this.gameSounds.regularAttack.play();
-            player1.play('player1-regular-attack', true);
+
+            // Play the correct attack animation based on direction
+            if (player1.flipX) {
+                player1.play('wolverine-basic-attack-left', true);
+            } else {
+                player1.play('wolverine-basic-attack-right', true);
+            }
+
             activateHitbox.call(this, player1, player2, 10);
         }
     }
@@ -500,19 +575,33 @@ function manageAttacks() {
             player1Mana -= 50;
             drawManaBar(player1ManaBar, player1Mana);
             this.gameSounds.superAttack.play();
-            player1.play('player1-super-attack', true);
+
+            // Play the correct super attack animation based on direction
+            if (player1.flipX) {
+                player1.play('wolverine-super-attack-left', true);
+            } else {
+                player1.play('wolverine-super-attack-right', true);
+            }
+
             activateSuperPunch.call(this, player1, player2);
         }
     }
 
-    // Implement similar logic for player2's attacks
+    // Handle Player 2 attacks
     if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
         lastPlayer2AttackTime = this.time.now;
         if (player2Mana >= 20) {
             player2Mana -= 20;
             drawManaBar(player2ManaBar, player2Mana);
             this.gameSounds.regularAttack.play();
-            player2.play('player2-regular-attack', true);
+
+            // Play the correct attack animation based on direction
+            if (player2.flipX) {
+                player2.play('wolverine-basic-attack-left', true);
+            } else {
+                player2.play('wolverine-basic-attack-right', true);
+            }
+
             activateHitbox.call(this, player2, player1, 10);
         }
     }
@@ -523,7 +612,14 @@ function manageAttacks() {
             player2Mana -= 50;
             drawManaBar(player2ManaBar, player2Mana);
             this.gameSounds.superAttack.play();
-            player2.play('player2-super-attack', true);
+
+            // Play the correct super attack animation based on direction
+            if (player2.flipX) {
+                player2.play('wolverine-super-attack-left', true);
+            } else {
+                player2.play('wolverine-super-attack-right', true);
+            }
+
             activateSuperPunch.call(this, player2, player1);
         }
     }
@@ -531,41 +627,41 @@ function manageAttacks() {
 
 // Function to activate hitbox for regular and super punch attacks
 function activateHitbox(attacker, target, baseDamage) {
-	if (!attacker || !attacker.active) return;
+    if (!attacker || !attacker.active) return;
 
-	const hitbox = this.physics.add
-		.sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null)
-		.setSize(40, 40)
-		.setVisible(false)
-		.setActive(true);
-	console.log(
-		`Activating hitbox for ${attacker === player1 ? "Player 1" : "Player 2"}`
-	);
+    const hitbox = this.physics.add
+        .sprite(attacker.x + (attacker.flipX ? -20 : 20), attacker.y, null)
+        .setSize(40, 40)
+        .setVisible(false)
+        .setActive(true);
+    console.log(
+        `Activating hitbox for ${attacker === player1 ? "Player 1" : "Player 2"}`
+    );
 
-	this.physics.add.overlap(
-		hitbox,
-		target,
-		() => {
-			const damage = baseDamage * attacker.damageMultiplier; // Apply damage multiplier
-			handlePlayerHit(attacker, target, hitbox, damage);
+    this.physics.add.overlap(
+        hitbox,
+        target,
+        () => {
+            const damage = baseDamage * attacker.damageMultiplier; // Apply damage multiplier
+            handlePlayerHit(attacker, target, hitbox, damage);
 
-			// Apply a small upward knockback for regular attacks
-			const direction = attacker.x < target.x ? 1 : -1;
-			target.setVelocityX(200 * direction); // Small horizontal pushback
-			target.setVelocityY(-100); // Moderate vertical lift to knock them upwards
-		},
-		null,
-		this
-	);
+            // Apply a small upward knockback for regular attacks
+            const direction = attacker.x < target.x ? 1 : -1;
+            target.setVelocityX(200 * direction); // Small horizontal pushback
+            target.setVelocityY(-100); // Moderate vertical lift to knock them upwards
+        },
+        null,
+        this
+    );
 
-	this.time.delayedCall(
-		100,
-		() => {
-			deactivateHitbox(hitbox);
-		},
-		[],
-		this
-	);
+    this.time.delayedCall(
+        100,
+        () => {
+            deactivateHitbox(hitbox);
+        },
+        [],
+        this
+    );
 }
 
 function activateSuperPunch(attacker, target) {
@@ -597,6 +693,8 @@ function activateSuperPunch(attacker, target) {
         console.log(`Super punch missed due to distance. Distance was ${distance}, required ${attackRange}.`);
     }
 }
+
+// Function to handle when a player is hit
 function handlePlayerHit(attacker, target, hitbox, damage) {
     if (hitbox.active && target.active && !target.body.immovable) {
         if (target === player1) {
@@ -623,6 +721,7 @@ function handlePlayerHit(attacker, target, hitbox, damage) {
         }
     }
 }
+
 
 function deactivateHitbox(hitbox) {
     if (hitbox && hitbox.active) {
