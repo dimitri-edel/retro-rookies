@@ -12,6 +12,10 @@ class CharacterSelectionScene extends Phaser.Scene {
             frameWidth: 70,  // Adjust the frameWidth to the actual width of each frame
             frameHeight: 60,  // Adjust the frameHeight to the actual height of each frame
         });
+    this.load.spritesheet('trunks-right', 'assets/trunks-right.png', {
+        frameWidth: 70.57142857,  // Width of each frame
+        frameHeight: 60,          // Height of each frame
+    });
     }
 
     create() {
@@ -22,15 +26,16 @@ class CharacterSelectionScene extends Phaser.Scene {
         }).setOrigin(0.5);
 
         // Display character options
-        const character1 = this.add.image(100, 150, 'player1').setInteractive();
-        const character2 = this.add.image(250, 150, 'player2').setInteractive();
-        const character3 = this.add.sprite(400, 150, 'wolverine', 0).setInteractive(); // Wolverine's first frame as a selection thumbnail
+    const character1 = this.add.image(100, 150, 'player1').setInteractive();
+    const character2 = this.add.image(250, 150, 'player2').setInteractive();
+    const character3 = this.add.sprite(400, 150, 'wolverine', 0).setInteractive(); // Wolverine's first frame as a selection thumbnail
+    const character4 = this.add.sprite(100, 250, 'trunks-right', 0).setInteractive(); // Trunks' first frame as a selection thumbnail
 
         // Adjust the hitboxes to match the visual elements
         character1.setDisplaySize(100, 100);
         character2.setDisplaySize(100, 100);
         character3.setDisplaySize(100, 100);
-
+    character4.setDisplaySize(100, 100);
         let player1Selected = null;
         let player2Selected = null;
 
@@ -109,7 +114,27 @@ class MainGame extends Phaser.Scene {
         frameHeight: 61,
     });
 
-		
+		  // Load Trunks spritesheets
+    this.load.spritesheet('trunks-right', 'assets/trunks-right.png', {
+        frameWidth: 70.57142857,  // Width of each frame
+        frameHeight: 60,          // Height of each frame
+    });
+
+    this.load.spritesheet('trunks-jump', 'assets/trunks-jump.png', {
+        frameWidth: 36.33333333,  // Width of each frame
+        frameHeight: 60,          // Height of each frame
+    });
+
+    this.load.spritesheet('trunks-attack-right', 'assets/trunks-attack-right.png', {
+        frameWidth: 67,           // Width of each frame
+        frameHeight: 60,          // Height of each frame
+    });
+
+    this.load.spritesheet('trunks-attack-super-right', 'assets/trunks-attack-super-right.png', {
+        frameWidth: 54.9,
+        frameHeight: 60,
+    });
+
 
 		this.load.image("pack-a-punch", "assets/sprites/pack-a-punch.png");
 		this.load.image("touch-of-death", "assets/sprites/touch-of-death.png");
@@ -221,22 +246,108 @@ this.anims.create({
     repeat: 0
 });
 
-        // Create player sprites based on selection
-        if (this.player1Character === 'wolverine') {
-            player1 = this.physics.add.sprite(50, 400, 'wolverine-left');
-            player1.play('wolverine-left');
-        } else {
-            player1 = this.physics.add.sprite(50, 400, 'player1');
-            player1.play('player1-idle');
-        }
 
-        if (this.player2Character === 'wolverine') {
-            player2 = this.physics.add.sprite(450, 400, 'wolverine-left');
-            player2.play('wolverine-left');
-        } else {
-            player2 = this.physics.add.sprite(450, 400, 'player2');
-            player2.play('player2-idle');
-        }
+    this.anims.create({
+        key: 'trunks-move-right',
+        frames: this.anims.generateFrameNumbers('trunks-right', { start: 0, end: 6 }),
+        frameRate: 15,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'trunks-jump-right',
+        frames: this.anims.generateFrameNumbers('trunks-jump', { start: 0, end: 5 }),
+        frameRate: 10,
+        repeat: 0
+    });
+
+    this.anims.create({
+        key: 'trunks-basic-attack-right',
+        frames: this.anims.generateFrameNumbers('trunks-attack-right', { start: 0, end: 4 }),
+        frameRate: basicAttackFrameRate,
+        repeat: 0
+    });
+
+this.anims.create({
+    key: 'trunks-super-attack-right',
+    frames: this.anims.generateFrameNumbers('trunks-attack-super-right', { start: 0, end: 9 }),
+    frameRate: superAttackFrameRate,
+    repeat: 0
+});
+
+
+    // Create Trunks' left-facing animations by mirroring the right-facing ones
+    this.anims.create({
+        key: 'trunks-move-left',
+        frames: this.anims.generateFrameNumbers('trunks-right', { start: 0, end: 6 }),
+        frameRate: 15,
+        repeat: -1
+    });
+
+    this.anims.create({
+        key: 'trunks-jump-left',
+        frames: this.anims.generateFrameNumbers('trunks-jump', { start: 0, end: 5 }),
+        frameRate: 10,
+        repeat: 0
+    });
+
+    this.anims.create({
+        key: 'trunks-basic-attack-left',
+        frames: this.anims.generateFrameNumbers('trunks-attack-right', { start: 0, end: 4 }),
+        frameRate: basicAttackFrameRate,
+        repeat: 0
+    });
+
+this.anims.create({
+    key: 'trunks-super-attack-left',
+    frames: this.anims.generateFrameNumbers('trunks-attack-super-right', { start: 0, end: 9 }),
+    frameRate: superAttackFrameRate,
+    repeat: 0
+});
+this.anims.create({
+    key: 'trunks-idle',
+    frames: [{ key: 'trunks-right', frame: 0 }], // Assuming the first frame of the 'trunks-right' spritesheet is the idle pose
+    frameRate: 1, // Slow frame rate since it's an idle animation
+    repeat: -1    // Loop indefinitely
+});
+
+// Trunks Idle Animations
+this.anims.create({
+    key: 'trunks-idle-right',
+    frames: [{ key: 'trunks-right', frame: 0 }], // Use the first frame as the idle frame
+    frameRate: 1,
+    repeat: -1
+});
+
+this.anims.create({
+    key: 'trunks-idle-left',
+    frames: [{ key: 'trunks-right', frame: 0 }],
+    frameRate: 1,
+    repeat: -1
+});
+        // Create player sprites based on selection
+          // Create player sprites based on selection
+   if (this.player1Character === 'wolverine') {
+    player1 = this.physics.add.sprite(50, 400, 'wolverine-left');
+    player1.play('wolverine-idle-right');
+} else if (this.player1Character === 'trunks-right') {
+    player1 = this.physics.add.sprite(50, 400, 'trunks-right');
+    player1.play('trunks-idle-right');
+} else {
+    player1 = this.physics.add.sprite(50, 400, 'player1');
+    player1.setTexture('player1'); // Set to the selected thumbnail as idle
+}
+
+if (this.player2Character === 'wolverine') {
+    player2 = this.physics.add.sprite(450, 400, 'wolverine-left');
+    player2.play('wolverine-idle-left');
+} else if (this.player2Character === 'trunks-right') {
+    player2 = this.physics.add.sprite(450, 400, 'trunks-right');
+    player2.play('trunks-idle-right');
+} else {
+    player2 = this.physics.add.sprite(450, 400, 'player2');
+    player2.setTexture('player2'); // Set to the selected thumbnail as idle
+}
 
 
 
@@ -316,19 +427,7 @@ drawManaBar(player2ManaBar, player2Mana);
 		player2.setGravityY(-300);
 
 
-    player1.play('player1-idle');
-    player2.play('player2-idle');
-        if (this.player1Character === 'wolverine') {
-            player1.play('wolverine-move-right');
-        } else {
-            player1.play('player1-idle');
-        }
-
-        if (this.player2Character === 'wolverine') {
-            player2.play('wolverine-move-left');
-        } else {
-            player2.play('player2-idle');
-        }
+  
 		// Add collision between players and platforms, traps, and lava
 		this.physics.add.collider(player1, platforms);
 		this.physics.add.collider(player2, platforms);
@@ -509,51 +608,70 @@ function resetEffect(player, property, defaultValue) {
 		console.error(`Failed to reset property: ${property}`);
 	}
 }
-
-// Function to handle player movement
 function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
     if (player && player.active) {
         player.setVelocityX(0);
 
+        // Movement to the left
         if (leftKey.isDown) {
             player.setVelocityX(-150 * player.speedMultiplier);
-            if (player.texture.key === 'wolverine-left') {
-                player.play('wolverine-move-right', true);
-            } else {
-                player.play('player1-move', true); // Adjust this to your character animation
+            if (player.currentAction !== 'moving-left') {
+                player.currentAction = 'moving-left';
+                if (player.texture.key.includes('trunks-right')) {
+                    player.play('trunks-move-left', true);
+                } else if (player.texture.key.includes('wolverine-left')) {
+                    player.play('wolverine-move-right', true);
+                }
             }
             player.flipX = true;  // Flip sprite to face left
-        } else if (rightKey.isDown) {
+        } 
+        // Movement to the right
+        else if (rightKey.isDown) {
             player.setVelocityX(150 * player.speedMultiplier);
-            if (player.texture.key === 'wolverine-left') {
-                player.play('wolverine-move-right', true);
-            } else {
-                player.play('player1-move', true);
+            if (player.currentAction !== 'moving-right') {
+                player.currentAction = 'moving-right';
+                if (player.texture.key.includes('trunks-right')) {
+                    player.play('trunks-move-right', true);
+                } else if (player.texture.key.includes('wolverine-left')) {
+                    player.play('wolverine-move-right', true);
+                }
             }
             player.flipX = false;  // Face right
-        } else {
-            // Idle state
-            if (player.texture.key === 'wolverine-left') {
-                player.play(player.flipX ? 'wolverine-idle-left' : 'wolverine-idle-right', true);
-            } else {
-                player.play('player1-idle', true);
+        } 
+        // No movement, set to idle
+        else if (player.body.blocked.down && player.currentAction !== 'idle') {
+            player.currentAction = 'idle';
+            if (player.texture.key.includes('trunks-right')) {
+                player.play(player.flipX ? 'trunks-idle-left' : 'trunks-idle-right');
+            } else if (player.texture.key.includes('wolverine-left')) {
+                player.play(player.flipX ? 'wolverine-idle-left' : 'wolverine-idle-right');
             }
         }
 
+        // Jumping logic
         if (jumpKey.isDown && player.body.blocked.down) {
             player.setVelocityY(-player.jumpHeight);
-            if (player.texture.key === 'wolverine-left') {
+            player.currentAction = 'jumping';
+            if (player.texture.key.includes('trunks-right')) {
+                player.play(player.flipX ? 'trunks-jump-left' : 'trunks-jump-right', true);
+            } else if (player.texture.key.includes('wolverine-left')) {
                 player.play('wolverine-jump', true);
-            } else {
-                player.play('player1-jump', true);
             }
         }
 
-        ensureSpriteVisibility(player);
+        // Ensure smooth transition back to idle after jump animation completes
+        player.on('animationcomplete', (anim) => {
+            if (player.currentAction === 'jumping' && anim.key.includes('jump')) {
+                player.currentAction = 'idle';
+                if (player.texture.key.includes('trunks-right')) {
+                    player.play(player.flipX ? 'trunks-idle-left' : 'trunks-idle-right');
+                } else if (player.texture.key.includes('wolverine-left')) {
+                    player.play(player.flipX ? 'wolverine-idle-left' : 'wolverine-idle-right');
+                }
+            }
+        });
     }
 }
-
-// Function to manage player attacks
 // Function to manage player attacks
 function manageAttacks() {
     // Handle Player 1 attacks
@@ -564,11 +682,11 @@ function manageAttacks() {
             drawManaBar(player1ManaBar, player1Mana);
             this.gameSounds.regularAttack.play();
 
-            // Play the correct attack animation based on direction
-            if (player1.flipX) {
-                player1.play('wolverine-basic-attack-left', true);
-            } else {
-                player1.play('wolverine-basic-attack-right', true);
+            // Play the correct attack animation based on direction and character
+            if (player1.texture.key.includes('trunks')) {
+                player1.play(player1.flipX ? 'trunks-basic-attack-left' : 'trunks-basic-attack-right', true);
+            } else if (player1.texture.key.includes('wolverine')) {
+                player1.play(player1.flipX ? 'wolverine-basic-attack-left' : 'wolverine-basic-attack-right', true);
             }
 
             activateHitbox.call(this, player1, player2, 10);
@@ -582,11 +700,11 @@ function manageAttacks() {
             drawManaBar(player1ManaBar, player1Mana);
             this.gameSounds.superAttack.play();
 
-            // Play the correct super attack animation based on direction
-            if (player1.flipX) {
-                player1.play('wolverine-super-attack-left', true);
-            } else {
-                player1.play('wolverine-super-attack-right', true);
+            // Play the correct super attack animation based on direction and character
+            if (player1.texture.key.includes('trunks')) {
+                player1.play(player1.flipX ? 'trunks-super-attack-left' : 'trunks-super-attack-right', true);
+            } else if (player1.texture.key.includes('wolverine')) {
+                player1.play(player1.flipX ? 'wolverine-super-attack-left' : 'wolverine-super-attack-right', true);
             }
 
             activateSuperPunch.call(this, player1, player2);
@@ -601,11 +719,11 @@ function manageAttacks() {
             drawManaBar(player2ManaBar, player2Mana);
             this.gameSounds.regularAttack.play();
 
-            // Play the correct attack animation based on direction
-            if (player2.flipX) {
-                player2.play('wolverine-basic-attack-left', true);
-            } else {
-                player2.play('wolverine-basic-attack-right', true);
+            // Play the correct attack animation based on direction and character
+            if (player2.texture.key.includes('trunks')) {
+                player2.play(player2.flipX ? 'trunks-basic-attack-left' : 'trunks-basic-attack-right', true);
+            } else if (player2.texture.key.includes('wolverine')) {
+                player2.play(player2.flipX ? 'wolverine-basic-attack-left' : 'wolverine-basic-attack-right', true);
             }
 
             activateHitbox.call(this, player2, player1, 10);
@@ -619,11 +737,11 @@ function manageAttacks() {
             drawManaBar(player2ManaBar, player2Mana);
             this.gameSounds.superAttack.play();
 
-            // Play the correct super attack animation based on direction
-            if (player2.flipX) {
-                player2.play('wolverine-super-attack-left', true);
-            } else {
-                player2.play('wolverine-super-attack-right', true);
+            // Play the correct super attack animation based on direction and character
+            if (player2.texture.key.includes('trunks')) {
+                player2.play(player2.flipX ? 'trunks-super-attack-left' : 'trunks-super-attack-right', true);
+            } else if (player2.texture.key.includes('wolverine')) {
+                player2.play(player2.flipX ? 'wolverine-super-attack-left' : 'wolverine-super-attack-right', true);
             }
 
             activateSuperPunch.call(this, player2, player1);
