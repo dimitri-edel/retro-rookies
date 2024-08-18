@@ -9,26 +9,29 @@ body {
         #3b41c5,#a981bb,#ffc8a9
     );
     color: #fff;
-    font-family: Arial, sans-serif;
     margin: 0;
 }
+
+
 .container {
     text-align: center;
 }
 
-/* Replace to image logo  */
-/* .title {
-    font-size: 4em;
-    margin-bottom: 20px;
-    font-family: Arial,Helvetica, sans-serif;
-    font-style: fantasy;
-    background: linear-gradient(to right, #eedd44, #ff6b08,#cf23cf, #f32170);
-    -webkit-text-fill-color: transparent;
-    -webkit-background-clip: text;
-} */
-
 img {
-    width: 90%;
+    width: 60% !important;
+}
+
+.logo_img {
+    width: 20% !important;
+    top: 0;
+    left: 0;
+    position: fixed;
+}
+
+.github_logo {
+    width: 2% !important;
+    height: auto;
+    margin-bottom: 10px;
 }
 
 .button {
@@ -53,3 +56,40 @@ img {
     margin-top: 20px;
 }
 
+footer {
+    bottom: 0 !important;
+    border-top: rgb(231, 38, 173) solid 3px;
+    position: fixed;
+    text-align: center;
+    width: 100%;
+}
+
+ /* Use a media query to add a breakpoint at 650px to make increased github images */
+ @media screen and (max-width: 650px) {
+    .github_logo {
+        width: 6% !important;
+        height: auto;
+        margin-bottom: 10px;
+    }
+}   
+
+/* Use a media query to add a breakpoint at 360px: for the home.html and index.html to increased image size */
+@media screen and (max-width: 360px) {
+    img {
+        width: 90% !important;
+    }
+    .button {
+       font-size: 1em;
+       padding: 10px;
+    }
+
+    .logo_img {
+        width: 30% !important;
+    }
+
+    .github_logo {
+        width: 10% !important;
+        height: auto;
+        margin-bottom: 10px;
+    }
+}   
