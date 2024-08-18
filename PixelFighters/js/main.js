@@ -240,6 +240,7 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 		this.load.audio('regular-attack', 'assets/sounds/regular-attack.mp3');
 		this.load.audio('super-attack', 'assets/sounds/super-attack.mp3');
 		this.load.audio('jump', 'assets/sounds/jump.mp3');
+        this.load.audio('background3', 'assets/music/background.mp3')
 
 		// Load lava, traps, and other necessary assets
 		this.load.image("lava", "assets/fire.png");
@@ -251,6 +252,13 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 		// Add and scale the background
 		const background = this.add.image(256, 240, "background");
 		background.setScale(4);
+
+        // Play background music
+        const backgroundMusic = this.sound.add('background3', {
+            volume: 0.1, // Set volume to a reasonable level
+            loop: true   // Loop the background music
+        });
+        backgroundMusic.play();
 
 		const attackDuration = 1; // 0.2 seconds for each attack animation
 
@@ -428,18 +436,18 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 			frameRate: 15,
 			repeat: -1
 		});
-this.anims.create({
-    key: 'vegeta-basic-attack-left',
-    frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }), 
-    frameRate: 20,
-    repeat: 0
-});
-	this.anims.create({
-    key: 'vegeta-basic-attack-right',
-    frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }), // Same frames as right but flipped
-    frameRate: 20,
-    repeat: 0
-});
+        this.anims.create({
+            key: 'vegeta-basic-attack-left',
+            frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }), 
+            frameRate: 20,
+            repeat: 0
+        });
+        this.anims.create({
+        key: 'vegeta-basic-attack-right',
+        frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }), // Same frames as right but flipped
+        frameRate: 20,
+        repeat: 0
+        });
 
 		this.anims.create({
 			key: 'vegeta-super-attack-right',
@@ -646,6 +654,13 @@ if (this.player2Character === 'vegeta-select') {
 		player1ManaBar = this.add.graphics({ x: 10, y: 30 });
 		player2HealthBar = this.add.graphics({ x: 400, y: 10 });
 		player2ManaBar = this.add.graphics({ x: 400, y: 30 });
+        
+        this.time.addEvent({
+            delay: 5000, // 5 seconds
+            callback: rechargeMana,
+            callbackScope: this, // Ensure `this` context is correct
+            loop: true
+        });
 
 		// Draw initial bars
 		drawHealthBar(player1HealthBar, player1Health);
@@ -772,14 +787,41 @@ update() {
 		}
 	}
 
-function hitTrap(player, trap) {
-	if (!gameOver) {
-		console.log(
-			`${player === player1 ? "Player 1" : "Player 2"} hit a trap at (${trap.x}, ${trap.y}). Instant Game Over.`
-		);
-		endGame.call(this, player === player1 ? "Player 2" : "Player 1");
-	}
-}
+    function hitTrap(player, trap) {
+        if (!player.trapContact) {
+            player.trapContact = true;
+    
+            // Disable player movement for 1.5 seconds
+            player.setVelocityX(0);
+            player.setVelocityY(0);
+            player.body.moves = false;
+    
+            this.time.delayedCall(1500, () => {
+                player.body.moves = true;
+                player.trapContact = false;
+                console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
+            }, [], this);
+    
+            console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap and is immobilized.`);
+    
+            // Make the trap disappear and respawn after 2 seconds
+            trap.setActive(false).setVisible(false);
+    
+            this.time.delayedCall(2000, () => {
+                respawnTrap(trap, this);
+            }, [], this);
+        }
+    }
+    
+    function respawnTrap(trap, scene) {
+        // Randomly select new position for the trap
+        const newX = Phaser.Math.Between(50, config.width - 50);
+        const newY = Phaser.Math.Between(50, config.height - 150);
+    
+        trap.setPosition(newX, newY);
+        trap.setActive(true).setVisible(true);
+        console.log('Trap has respawned at a new location.');
+    }
 
 
 function adjustDirectionBasedOnOpponent(player, opponent) {
