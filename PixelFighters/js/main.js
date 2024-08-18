@@ -54,8 +54,8 @@ class CharacterSelectionScene extends Phaser.Scene {
 		character2.setDisplaySize(100, 100);
 		character3.setDisplaySize(100, 100);
 		character4.setDisplaySize(100, 100);
-    character5.setDisplaySize(100, 100);
-    character6.setDisplaySize(100, 100);
+        character5.setDisplaySize(100, 100);
+        character6.setDisplaySize(100, 100);
 		character7.setDisplaySize(100, 100);
 		let player1Selected = null;
 		let player2Selected = null;
@@ -622,32 +622,30 @@ if (this.player2Character === 'vegeta-select') {
 		}
 
 		// Map setup (same as before)
-		platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody();
-		platforms.create(128, 400, getRandomTile()).setScale(3, 1).refreshBody();
-		platforms.create(384, 400, getRandomTile()).setScale(3, 1).refreshBody();
-		platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody();
-		platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody();
-		platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();
-		platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody();
-		platforms.create(192, 220, getRandomTile()).setScale(3, 1).refreshBody();
-		platforms.create(320, 220, getRandomTile()).setScale(3, 1).refreshBody();
-		platforms.create(256, 170, getRandomTile()).setScale(4, 1).refreshBody();
+		platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
+		platforms.create(130, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
+        platforms.create(380, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
+		platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
+        platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
+        platforms.create(250, 300, getRandomTile()).setScale(10, 1).refreshBody(); // Right upper middle platform
+		// Upper Platforms - High-Level for Aerial Combat
+        platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+        platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+		platforms.create(334, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+        platforms.create(160, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
 
 
 		// Super Jump Platforms at the Bottom Left and Right
-		const leftSuperJump = platforms.create(64, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
-		const rightSuperJump = platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+		const leftSuperJump = platforms.create(50, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+        const rightSuperJump = platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
 		// Lava and traps setup
 		const lava = this.physics.add.staticGroup();
 		lava.create(256, 478, "lava").setScale(32, 0.5).refreshBody();
 
 		const traps = this.physics.add.group();
-		traps.create(192, 360, "spikes").setScale(0.25).refreshBody(); // Trap on left middle platform
-		traps.create(384, 250, "trap").setScale(0.25).refreshBody(); // Trap on upper right platform
-		traps.create(100, 430, "trap").setScale(0.25).refreshBody(); // Trap on platform 1
+		traps.create(380, 250, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
 		traps.create(200, 430, "spikes").setScale(0.25).refreshBody();
-		traps.create(400, 350, "spikes").setScale(0.25).refreshBody();
-		traps.create(150, 200, "spikes").setScale(0.25).refreshBody();
+		traps.create(130, 290, 'trap').setScale(0.25).refreshBody(); // Trap on left lower platform
 
 		// Initialize player health and mana text displays
 		player1HealthBar = this.add.graphics({ x: 10, y: 10 });
@@ -658,10 +656,9 @@ if (this.player2Character === 'vegeta-select') {
         this.time.addEvent({
             delay: 5000, // 5 seconds
             callback: rechargeMana,
-            callbackScope: this, // Ensure `this` context is correct
+            callbackScope: this,
             loop: true
         });
-
 		// Draw initial bars
 		drawHealthBar(player1HealthBar, player1Health);
 		drawManaBar(player1ManaBar, player1Mana);
