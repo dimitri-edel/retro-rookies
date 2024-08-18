@@ -661,7 +661,7 @@ class MainGame extends Phaser.Scene {
 			player1.play('vegeta-idle-right');
 			player1.flipX = false; // Ensure Player 1 faces right
 		} else if (this.player1Character === 'terminator-select') {
-			player1 = this.physics.add.sprite(50, 400, 'terminator-idle-right').setScale(0.5);
+			player1 = this.physics.add.sprite(50, 400, 'terminator-idle-right').setScale(0.4);
 			player1.play('terminator-idle-right');
 			// Since some sprites need scaling , set size for player 1
 			player1.setSize(50, 110);
