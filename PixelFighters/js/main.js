@@ -609,67 +609,72 @@ function resetEffect(player, property, defaultValue) {
 	}
 }
 function handlePlayerMovement(player, leftKey, rightKey, jumpKey) {
-    if (player && player.active) {
-        player.setVelocityX(0);
+    if (!player || !player.active) return;
 
-        // Movement to the left
-        if (leftKey.isDown) {
-            player.setVelocityX(-150 * player.speedMultiplier);
-            if (player.currentAction !== 'moving-left') {
-                player.currentAction = 'moving-left';
-                if (player.texture.key.includes('trunks-right')) {
-                    player.play('trunks-move-left', true);
-                } else if (player.texture.key.includes('wolverine-left')) {
-                    player.play('wolverine-move-right', true);
-                }
-            }
-            player.flipX = true;  // Flip sprite to face left
-        } 
-        // Movement to the right
-        else if (rightKey.isDown) {
-            player.setVelocityX(150 * player.speedMultiplier);
-            if (player.currentAction !== 'moving-right') {
-                player.currentAction = 'moving-right';
-                if (player.texture.key.includes('trunks-right')) {
-                    player.play('trunks-move-right', true);
-                } else if (player.texture.key.includes('wolverine-left')) {
-                    player.play('wolverine-move-right', true);
-                }
-            }
-            player.flipX = false;  // Face right
-        } 
-        // No movement, set to idle
-        else if (player.body.blocked.down && player.currentAction !== 'idle') {
-            player.currentAction = 'idle';
-            if (player.texture.key.includes('trunks-right')) {
-                player.play(player.flipX ? 'trunks-idle-left' : 'trunks-idle-right');
-            } else if (player.texture.key.includes('wolverine-left')) {
-                player.play(player.flipX ? 'wolverine-idle-left' : 'wolverine-idle-right');
-            }
+    // Initialize player's state if not already set
+    if (!player.state) {
+        player.state = 'idle';  // Default to idle state
+    }
+
+    // Jumping logic first (takes priority when pressed)
+    if (jumpKey.isDown && player.body.blocked.down) {
+        player.setVelocityY(-player.jumpHeight);
+        player.state = 'jumping';
+        playAnimation(player, 'jump');
+        return;  // Exit early to prevent other animations from playing
+    }
+
+    // Reset velocityX before handling horizontal movement
+    player.setVelocityX(0);
+
+    // Handle horizontal movement
+    if (leftKey.isDown) {
+        player.setVelocityX(-150 * player.speedMultiplier);
+        if (player.state !== 'moving') {
+            player.state = 'moving';
+            playAnimation(player, 'move-left');
         }
-
-        // Jumping logic
-        if (jumpKey.isDown && player.body.blocked.down) {
-            player.setVelocityY(-player.jumpHeight);
-            player.currentAction = 'jumping';
-            if (player.texture.key.includes('trunks-right')) {
-                player.play(player.flipX ? 'trunks-jump-left' : 'trunks-jump-right', true);
-            } else if (player.texture.key.includes('wolverine-left')) {
-                player.play('wolverine-jump', true);
-            }
+        player.flipX = true;
+    } else if (rightKey.isDown) {
+        player.setVelocityX(150 * player.speedMultiplier);
+        if (player.state !== 'moving') {
+            player.state = 'moving';
+            playAnimation(player, 'move-right');
         }
+        player.flipX = false;
+    } else if (player.body.blocked.down) {
+        // Only transition to idle if on the ground and no movement key is pressed
+        if (player.state !== 'idle') {
+            player.state = 'idle';
+            playAnimation(player, 'idle');
+        }
+    }
 
-        // Ensure smooth transition back to idle after jump animation completes
-        player.on('animationcomplete', (anim) => {
-            if (player.currentAction === 'jumping' && anim.key.includes('jump')) {
-                player.currentAction = 'idle';
-                if (player.texture.key.includes('trunks-right')) {
-                    player.play(player.flipX ? 'trunks-idle-left' : 'trunks-idle-right');
-                } else if (player.texture.key.includes('wolverine-left')) {
-                    player.play(player.flipX ? 'wolverine-idle-left' : 'wolverine-idle-right');
-                }
-            }
-        });
+    // If player is jumping, check if they have landed
+    if (player.state === 'jumping' && player.body.blocked.down) {
+        player.state = 'idle';
+        playAnimation(player, 'idle');
+    }
+
+    // Ensure the player remains visible and active
+    ensureSpriteVisibility(player);
+}
+
+function playAnimation(player, action) {
+    switch (action) {
+        case 'jump':
+            player.play(player.texture.key.includes('wolverine') ? 'wolverine-jump' : 'trunks-jump-right', true);
+            break;
+        case 'move-left':
+            player.play(player.texture.key.includes('wolverine') ? 'wolverine-move-right' : 'trunks-move-left', true);
+            break;
+        case 'move-right':
+            player.play(player.texture.key.includes('wolverine') ? 'wolverine-move-right' : 'trunks-move-right', true);
+            break;
+        case 'idle':
+        default:
+            player.play(player.texture.key.includes('wolverine') ? 'wolverine-idle-right' : 'trunks-idle-right', true);
+            break;
     }
 }
 // Function to manage player attacks
