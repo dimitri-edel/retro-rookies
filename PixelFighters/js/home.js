@@ -1,5 +1,5 @@
 // Create a new Audio object for the sound effect
-const clickSound = new Audio('../assets/music/click.mp3');
+const clickSound = new Audio('assets/music/click.mp3');
 
 
 // Function to play sound
