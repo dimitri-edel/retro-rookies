@@ -643,9 +643,9 @@ if (this.player2Character === 'vegeta-select') {
 		lava.create(256, 478, "lava").setScale(32, 0.5).refreshBody();
 
 		const traps = this.physics.add.group();
-		traps.create(380, 250, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
+		traps.create(294, 180, 'trap').setScale(0.25).refreshBody(); // Trap on upper right platform
 		traps.create(200, 430, "spikes").setScale(0.25).refreshBody();
-		traps.create(130, 290, 'trap').setScale(0.25).refreshBody(); // Trap on left lower platform
+		traps.create(190, 180, 'trap').setScale(0.25).refreshBody(); // Trap on left lower platform
 
 		// Initialize player health and mana text displays
 		player1HealthBar = this.add.graphics({ x: 10, y: 10 });
@@ -665,14 +665,14 @@ if (this.player2Character === 'vegeta-select') {
 		player1.setBounce(0.2);
 		player1.setCollideWorldBounds(true);
 		player1.damageMultiplier = 1;
-		player1.jumpHeight = 250;
+		player1.jumpHeight = 260;
 		player1.speedMultiplier = 1;
 		player1.setGravityY(-300);
 
 		player2.setBounce(0.2);
 		player2.setCollideWorldBounds(true);
 		player2.damageMultiplier = 1;
-		player2.jumpHeight = 250;
+		player2.jumpHeight = 260;
 		player2.speedMultiplier = 1;
 		player2.setGravityY(-300);
 
@@ -787,7 +787,7 @@ update() {
             player.setVelocityY(0);
             player.body.moves = false;
     
-            this.time.delayedCall(1500, () => {
+            this.time.delayedCall(1000, () => {
                 player.body.moves = true;
                 player.trapContact = false;
                 console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
@@ -798,7 +798,7 @@ update() {
             // Make the trap disappear and respawn after 2 seconds
             trap.setActive(false).setVisible(false);
     
-            this.time.delayedCall(2000, () => {
+            this.time.delayedCall(4000, () => {
                 respawnTrap(trap, this);
             }, [], this);
         }
@@ -1018,6 +1018,10 @@ function playAnimation(player, action) {
 
 
 function manageAttacks() {
+
+    player1.mana = player1Mana;
+    player2.mana = player2Mana;
+
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now; // Update last attack time
         handleAttack.call(this, player1, player2, 'regular');
