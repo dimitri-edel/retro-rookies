@@ -1,0 +1,6 @@
+source: https://www.spriters-resource.com
+frame width: 70px
+frame height: 60px
+total rows: 11
+total columns: 8
+total Frames: 88
