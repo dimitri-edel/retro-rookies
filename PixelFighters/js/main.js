@@ -652,13 +652,7 @@ if (this.player2Character === 'vegeta-select') {
 		player1ManaBar = this.add.graphics({ x: 10, y: 30 });
 		player2HealthBar = this.add.graphics({ x: 400, y: 10 });
 		player2ManaBar = this.add.graphics({ x: 400, y: 30 });
-        
-        this.time.addEvent({
-            delay: 5000, // 5 seconds
-            callback: rechargeMana,
-            callbackScope: this,
-            loop: true
-        });
+  
 		// Draw initial bars
 		drawHealthBar(player1HealthBar, player1Health);
 		drawManaBar(player1ManaBar, player1Mana);
@@ -1079,7 +1073,14 @@ function handleAttack(attacker, target, type) {
 
     if (attacker.mana >= manaCost) {
         attacker.mana -= manaCost;
-        
+
+        // Update the global mana variables
+        if (attacker === player1) {
+            player1Mana = attacker.mana;
+        } else if (attacker === player2) {
+            player2Mana = attacker.mana;
+        }
+
         if (type === 'regular' || type === 'super') {
             this.gameSounds[`${type}Attack`].play();
             activateHitbox.call(this, attacker, target, type === 'regular' ? 10 : 25);
@@ -1222,16 +1223,16 @@ function drawManaBar(graphics, mana) {
 
 // Recharge mana for both players every 5 seconds
 function rechargeMana() {
-	if (player1Mana < 100) {
-		player1Mana = Math.min(player1Mana + 20, 100);
-		drawManaBar(player1ManaBar, player1Mana);
-		console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
-	}
-	if (player2Mana < 100) {
-		player2Mana = Math.min(player2Mana + 20, 100);
-		drawManaBar(player2ManaBar, player2Mana);
-		console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
-	}
+   if (player1Mana < 100) {
+        player1Mana = Math.min(player1Mana + 20, 100);
+        drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+        console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
+    }
+    if (player2Mana < 100) {
+        player2Mana = Math.min(player2Mana + 20, 100);
+        drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+        console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
+    }
 }
 
 // End the game and declare a winner
