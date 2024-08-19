@@ -696,9 +696,10 @@ class MainGame extends Phaser.Scene {
 			player2.play('vegeta-idle-left');
 			player2.flipX = true; // Ensure Player 2 faces left
 		} else if (this.player2Character === 'terminator-select') {
-			player2 = this.physics.add.sprite(450, playerDropHeight, 'terminator-idle-right');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'terminator-idle-right').setScale(0.4);
 			player2.play('terminator-idle-right');
-			player2.flipX = true; // Ensure Player 2 faces left
+			player2.flipX = true;
+			player2.setSize(50, 110); // Ensure Player 2 faces left
 		}
 		else if (this.player2Character === 'wolverine') {
 			player2 = this.physics.add.sprite(450, playerDropHeight, 'wolverine-left');
