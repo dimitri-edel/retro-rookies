@@ -92,7 +92,7 @@ body {
 
 footer {
     bottom: 0 !important;
-    border-top: rgb(231, 38, 173) solid 3px;
+    /* border-top: rgb(231, 38, 173) solid 3px; */
     position: fixed;
     text-align: center;
     width: 100%;
