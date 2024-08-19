@@ -39,11 +39,13 @@ body {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
     max-width: 600px;
     width: 100%;
+    max-height: 75vh;
     margin-bottom: 20px; 
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    overflow-y: scroll;
 }
 
 /* Style the heading and paragraph */
