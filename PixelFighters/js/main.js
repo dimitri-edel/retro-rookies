@@ -63,23 +63,28 @@ class CharacterSelectionScene extends Phaser.Scene {
 		this.input.on('gameobjectdown', (pointer, gameObject) => {
 			if (!player1Selected) {
 				player1Selected = gameObject.texture.key;
-				this.add.text(100, 250, "Player 1 Selected", {
+				this.add.text(gameObject.x - 20, gameObject.y, "Player 1", {
 					fontFamily: 'Arial',
 					fontSize: '18px',
 					fill: 'white',
 				});
-				this.add.text(256, 300, "Player 2, Select Your Character", {
+				
+				this.add.rectangle(gameObject.x, gameObject.y, 100, 100, 0x000000, 0.5);
+
+				this.add.text(256, 50, "Player 2, Select Your Character", {
 					fontFamily: 'Arial',
 					fontSize: '24px',
 					fill: 'white',
 				}).setOrigin(0.5);
 			} else if (!player2Selected) {
 				player2Selected = gameObject.texture.key;
-				this.add.text(250, 250, "Player 2 Selected", {
+				this.add.text(gameObject.x - 20, gameObject.y, "Player 2", {
 					fontFamily: 'Arial',
 					fontSize: '18px',
 					fill: 'white',
 				});
+				this.add.rectangle(gameObject.x, gameObject.y, 100, 100, 0x000000, 0.5);
+
 				this.time.delayedCall(1000, () => {
 					this.startGame(player1Selected, player2Selected);
 				});
