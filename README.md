@@ -16,30 +16,30 @@ The project 'Pixel Fighters' is a one player 2D game built with HTML5, CSS, and 
 Simply open `index.html` in a web browser to play the game.
 ## User Stories
 ### Navigation
-- I want to see the title of the game 'Pixel Fighters' as soon as I open the website with  access to the options; 'Start', How to Play' and 'About the Game'.
-- I want to see a large pixel logo against a plain background and a simple menu so I know the genre of the game
-- I want to hear 8-bit upbeat background music in line with the genre and to entice me to play the game.
-- I want the options to change colour when I hover with the cursor or browse with the keyboard so I can visually identify where I am navigating.
-- I want the option I select to change colour to signify I have selected it.
-- I want the option I select to make a sound effect to signify I have selected it.
-- I want sound effects as I browse between the options as an additional method to identify where I am navigating.
+- want to see the title of the game 'Pixel Fighters' as soon as I open the website with  access to the options; 'Start', How to Play' and 'About the Game'.
+- want to see a large pixel logo against a plain background and a simple menu so I know the genre of the game
+- want to hear 8-bit upbeat background music in line with the genre and to entice me to play the game.
+- want the options to change colour when I hover with the cursor or browse with the keyboard so I can visually identify where I am navigating.
+- want the option I select to change colour to signify I have selected it.
+- want the option I select to make a sound effect to signify I have selected it.
+- want sound effects as I browse between the options as an additional method to identify where I am navigating.
 ### Start
-- I want the 'start' button to be the first in the menu for speed and ease if I want to play immediately because I expect it to be intuitive.
+- want the 'start' button to be the first in the menu for speed and ease if I want to play immediately because I expect it to be intuitive.
 
 ### How to play
-- I want the option to learn the rules of the game and learn shortcuts to improve my performance when playing.
+- want the option to learn the rules of the game and learn shortcuts to improve my performance when playing.
 
   ### Playing the game
-- I expect to be able to identify my character immediately so I am comfortable starting the game
-- I expect to be able to identify my opponent immediately so I am not confused who I am fighting against
-- I want to hear background music to keep me engaged and entertained
-- I want to hear sound effects to reflect movements of my character e.g jump and punch and sound effects as characters attack each other
-- I want to see a health bar so I can understand if I am winning or losing against my opponent
-- I want to see a 'win' or 'lose' at the end of a game to clarify who won or lost.   
+- expect to be able to identify my character immediately so I am comfortable starting the game
+- expect to be able to identify my opponent immediately so I am not confused who I am fighting against
+- want to hear background music to keep me engaged and entertained
+- want to hear sound effects to reflect movements of my character e.g jump and punch and sound effects as characters attack each other
+- want to see a health bar so I can understand if I am winning or losing against my opponent
+- want to see a 'win' or 'lose' at the end of a game to clarify who won or lost.   
 
 ### About the Game
-- I want to view the purpose for making the website so I can understand why it was created.
-- I want to view a list of individiuals involved in creating the project so I can understand who contributed and their role.  
+- want to view the purpose for making the website so I can understand why it was created.
+- want to view a list of individiuals involved in creating the project so I can understand who contributed and their role.  
 
 ## Criteria
 - **Project is a retro game**
@@ -122,10 +122,10 @@ Simply open `index.html` in a web browser to play the game.
   ### Sound Effects:
   Background music and sound effects downloaded from [Pixabay](https://pixabay.com/)
   ## Team
-  - Dimitri Edel [GitHub](https://www.github.com/https://github.com/dimitri-edel)
+  - Dimitri Edel [GitHub](https://github.com/dimitri-edel)
   - Liam Goddard [GitHub](https://www.github.com/caleom)
-  - Maushum Gurrung [GitHub](https://www.github.com/grgmaushum)
-  - Laura Masterton [GitHub](https://www.github.com/https://www.github.com/Laura-Masterton)
+  - Maushum Gurrung [GitHub](https://github.com/grgmausham)
+  - Laura Masterton [GitHub](https://www.github.com/Laura-Masterton)
   - Jesse Lee Ross[GitHub](https://www.github.com/jesseross001)
   - Robert Quinlan[GitHub](https://github.com/RQISL)
   
