@@ -5,9 +5,11 @@ class CharacterSelectionScene extends Phaser.Scene {
 	}
 
 	preload() {
-		// Load character thumbnails or icons
-		this.load.image('player1', 'assets/sprites/player1.png');
-		this.load.image('player2', 'assets/sprites/player2.png');
+		this.load.spritesheet('terminator-select', 'assets/terminator-select.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 100,          // Height of each frame
+		});
+
 		this.load.spritesheet('wolverine', 'assets/wolverine-spritesheet.png', {
 			frameWidth: 70,  // Adjust the frameWidth to the actual width of each frame
 			frameHeight: 60,  // Adjust the frameHeight to the actual height of each frame
@@ -22,16 +24,16 @@ class CharacterSelectionScene extends Phaser.Scene {
 			frameHeight: 60,          // Height of each frame
 		});
 
-    this.load.spritesheet('sasuke-select', 'assets/sasuke-move-left.png', {
-        frameWidth: 60.83333333,
-        frameHeight: 60,
-    });
+		this.load.spritesheet('sasuke-select', 'assets/sasuke-move-left.png', {
+			frameWidth: 60.83333333,
+			frameHeight: 60,
+		});
 		this.load.spritesheet('batman-select', 'assets/batman-super-attack-left.png', {  // Load Batman's super attack sprite sheet
 			frameWidth: 62.42857143,  // Frame width for Batman's super attack
 			frameHeight: 60           // Frame height for Batman's super attack
 		});
 	}
-	
+
 	create() {
 		this.add.text(256, 50, "Player 1, Select Your Character", {
 			fontFamily: 'Arial',
@@ -40,22 +42,19 @@ class CharacterSelectionScene extends Phaser.Scene {
 		}).setOrigin(0.5);
 
 		// Display character options
-		// Display character options
-		const character1 = this.add.image(100, 150, 'player1').setInteractive();
-		const character2 = this.add.image(250, 150, 'player2').setInteractive();
+		const character1 = this.add.sprite(100, 150, 'terminator-select', 0).setInteractive(); // Wolverine's first frame as a selection thumbnail
 		const character3 = this.add.sprite(400, 150, 'wolverine', 0).setInteractive(); // Wolverine's first frame as a selection thumbnail
 		const character4 = this.add.sprite(100, 250, 'trunks-select', 0).setInteractive(); // Trunks' first frame as a selection thumbnail
 		const character5 = this.add.sprite(250, 250, 'vegeta-select', 0).setInteractive(); // Vegeta's first frame as a selection thumbnail
 		const character6 = this.add.sprite(400, 250, 'sasuke-select', 0).setInteractive();
 		const character7 = this.add.sprite(100, 350, 'batman-select', 5).setInteractive(); // Batman's super attack frame 5 as a selection thumbnail
 
-		// Adjust the hitboxes to match the visual elements
+		// Scale the character options
 		character1.setDisplaySize(100, 100);
-		character2.setDisplaySize(100, 100);
 		character3.setDisplaySize(100, 100);
 		character4.setDisplaySize(100, 100);
-        character5.setDisplaySize(100, 100);
-        character6.setDisplaySize(100, 100);
+		character5.setDisplaySize(100, 100);
+		character6.setDisplaySize(100, 100);
 		character7.setDisplaySize(100, 100);
 		let player1Selected = null;
 		let player2Selected = null;
@@ -114,7 +113,51 @@ class MainGame extends Phaser.Scene {
 		// Load assets based on selected characters
 		this.load.image("background", "assets/sprites/background.png");
 
-		// Load the images you manually cropped
+
+		// Load the spritesheets for the selected characters
+		// Terminator spritesheets
+		// Sequence of terminator walking left
+		this.load.spritesheet('terminator-walk-left', 'assets/sprites/terminator-walk-left.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator walking right
+		this.load.spritesheet('terminator-walk-right', 'assets/sprites/terminator-walk-right.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator jumping right
+		this.load.spritesheet('terminator-jump-right', 'assets/sprites/terminator-jump-right.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator jumping left
+		this.load.spritesheet('terminator-jump-left', 'assets/sprites/terminator-jump-left.png', {
+			frameWidth: 80,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator attacking right
+		this.load.spritesheet('terminator-attack-right', 'assets/sprites/terminator-attack-right.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator attacking left
+		this.load.spritesheet('terminator-attack-left', 'assets/sprites/terminator-attack-left.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator super attacking right
+		this.load.spritesheet('terminator-super-attack-right', 'assets/sprites/terminator-super-attack-right.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+		// Sequence of terminator super attacking left
+		this.load.spritesheet('terminator-super-attack-left', 'assets/sprites/terminator-super-attack-left.png', {
+			frameWidth: 200,  // Width of each frame
+			frameHeight: 130,          // Height of each frame
+		});
+
+
 		this.load.spritesheet('wolverine-left', 'assets/wolverine-left.png', {
 			frameWidth: 50.6,
 			frameHeight: 42,
@@ -178,28 +221,28 @@ class MainGame extends Phaser.Scene {
 			frameHeight: 60,
 		});
 
-// Preload Sasuke's spritesheets
-this.load.spritesheet('sasuke-move-left', 'assets/sasuke-move-left.png', {
-    frameWidth: 60.83333333,
-    frameHeight: 60,
-});
+		// Preload Sasuke's spritesheets
+		this.load.spritesheet('sasuke-move-left', 'assets/sasuke-move-left.png', {
+			frameWidth: 60.83333333,
+			frameHeight: 60,
+		});
 
-this.load.spritesheet('sasuke-jump', 'assets/sasuke-jump.png', {
-    frameWidth: 61.83333333,
-    frameHeight: 60,
-});
+		this.load.spritesheet('sasuke-jump', 'assets/sasuke-jump.png', {
+			frameWidth: 61.83333333,
+			frameHeight: 60,
+		});
 
-this.load.spritesheet('sasuke-super-attack-left', 'assets/sasuke-super-attack-left.png', {
-    frameWidth: 77,
-    frameHeight: 60,
-});
+		this.load.spritesheet('sasuke-super-attack-left', 'assets/sasuke-super-attack-left.png', {
+			frameWidth: 77,
+			frameHeight: 60,
+		});
 
-this.load.spritesheet('sasuke-attack-left', 'assets/sasuke-attack-left.png', {
-    frameWidth: 87.25,
-    frameHeight: 60,
-});
+		this.load.spritesheet('sasuke-attack-left', 'assets/sasuke-attack-left.png', {
+			frameWidth: 87.25,
+			frameHeight: 60,
+		});
 
-this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
+		this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 			frameWidth: 50.5,
 			frameHeight: 60,
 			endFrame: 8
@@ -240,7 +283,7 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 		this.load.audio('regular-attack', 'assets/sounds/regular-attack.mp3');
 		this.load.audio('super-attack', 'assets/sounds/super-attack.mp3');
 		this.load.audio('jump', 'assets/sounds/jump.mp3');
-        this.load.audio('background3', 'assets/music/background.mp3')
+		this.load.audio('background3', 'assets/music/background.mp3')
 
 		// Load lava, traps, and other necessary assets
 		this.load.image("lava", "assets/fire.png");
@@ -253,18 +296,94 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 		const background = this.add.image(256, 240, "background");
 		background.setScale(4);
 
-        // Play background music
-        const backgroundMusic = this.sound.add('background3', {
-            volume: 0.1, // Set volume to a reasonable level
-            loop: true   // Loop the background music
-        });
-        backgroundMusic.play();
+		// Play background music
+		const backgroundMusic = this.sound.add('background3', {
+			volume: 0.1, // Set volume to a reasonable level
+			loop: true   // Loop the background music
+		});
+		backgroundMusic.play();
 
 		const attackDuration = 1; // 0.2 seconds for each attack animation
 
 		// Calculate frame rates based on the number of frames
 		const basicAttackFrameRate = 20 / attackDuration; // Assuming 4 frames for basic attack
 		const superAttackFrameRate = 20 / attackDuration;
+
+		// Create animations for the terminator
+		// Terminator walking right
+		this.anims.create({
+			key: 'terminator-walk-right',
+			frames: this.anims.generateFrameNumbers('terminator-walk-right', { start: 0, end: 4 }), // Adjust frame numbers
+			frameRate: 15, // Faster frame rate for walking
+			repeat: -1 // Loop indefinitely
+		});
+		// Terminator walking left
+		this.anims.create({
+			key: 'terminator-walk-left',
+			frames: this.anims.generateFrameNumbers('terminator-walk-left', { start: 0, end: 4 }), // Adjust frame numbers
+			frameRate: 15, // Faster frame rate for walking
+			repeat: -1 // Loop indefinitely
+		});
+		// Terminator is idle left
+		this.anims.create({
+			key: 'terminator-idle-left',
+			frames: [{ key: 'terminator-walk-left', frame: 0 }], // Choose a single frame for idle
+			frameRate: 1, // Very slow or no repeat
+			repeat: 0
+		});
+		// Terminator is idle right
+		this.anims.create({
+			key: 'terminator-idle-right',
+			frames: [{ key: 'terminator-walk-right', frame: 0 }], // Choose a single frame for idle
+			frameRate: 1, // Very slow or no repeat
+			repeat: 0
+		});
+
+
+		// Terminator jumping right
+		this.anims.create({
+			key: 'terminator-jump-right',
+			frames: [{ key: 'terminator-jump-right', frame: 0 }], // Single frame for jumping
+			frameRate: 10,
+			repeat: 0
+		});
+		// Terminator jumping left
+		this.anims.create({
+			key: 'terminator-jump-left',
+			frames: [{ key: 'terminator-jump-left', frame: 0 }], // Single frame for jumping
+			frameRate: 10,
+			repeat: 0
+		});
+
+		// Terminator basic attack right
+		this.anims.create({
+			key: 'terminator-attack-right',
+			frames: this.anims.generateFrameNumbers('terminator-attack-right', { start: 0, end: 4 }), // 4 frames
+			frameRate: basicAttackFrameRate,
+			repeat: 0
+		});
+		// Terminator basic attack left
+		this.anims.create({
+			key: 'terminator-attack-left',
+			frames: this.anims.generateFrameNumbers('terminator-attack-left', { start: 0, end: 4 }), // 4 frames
+			frameRate: basicAttackFrameRate,
+			repeat: 0
+		});
+		// Terminator super attack right
+		this.anims.create({
+			key: 'terminator-super-attack-right',
+			frames: this.anims.generateFrameNumbers('terminator-super-attack-right', { start: 0, end: 4 }), // 5 frames
+			frameRate: superAttackFrameRate,
+			repeat: 0
+		});
+		// Terminator super attack left
+		this.anims.create({
+			key: 'terminator-super-attack-left',
+			frames: this.anims.generateFrameNumbers('terminator-super-attack-left', { start: 0, end: 4 }), // 5 frames
+			frameRate: superAttackFrameRate,
+			repeat: 0
+		});
+
 
 		// Create animations for Wolverine
 		// Create Wolverine animations
@@ -275,21 +394,7 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 			repeat: -1 // Loop indefinitely
 		});
 
-		// Create the player1-idle animation using Wolverine's first frame
-		this.anims.create({
-			key: 'player1-idle',
-			frames: [{ key: 'wolverine-left', frame: 0 }], // First frame of the wolverine-left spritesheet
-			frameRate: 1,
-			repeat: -1
-		});
 
-		// Create the player1-idle animation using Wolverine's first frame
-		this.anims.create({
-			key: 'player2-idle',
-			frames: [{ key: 'wolverine-left', frame: 0 }], // First frame of the wolverine-left spritesheet
-			frameRate: 1,
-			repeat: -1
-		});
 
 		this.anims.create({
 			key: 'wolverine-jump',
@@ -436,18 +541,18 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 			frameRate: 15,
 			repeat: -1
 		});
-        this.anims.create({
-            key: 'vegeta-basic-attack-left',
-            frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }), 
-            frameRate: 20,
-            repeat: 0
-        });
-        this.anims.create({
-        key: 'vegeta-basic-attack-right',
-        frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }), // Same frames as right but flipped
-        frameRate: 20,
-        repeat: 0
-        });
+		this.anims.create({
+			key: 'vegeta-basic-attack-left',
+			frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }),
+			frameRate: 20,
+			repeat: 0
+		});
+		this.anims.create({
+			key: 'vegeta-basic-attack-right',
+			frames: this.anims.generateFrameNumbers('vegeta-attack-right', { start: 0, end: 7 }), // Same frames as right but flipped
+			frameRate: 20,
+			repeat: 0
+		});
 
 		this.anims.create({
 			key: 'vegeta-super-attack-right',
@@ -456,66 +561,66 @@ this.load.spritesheet('batman-attack-left', 'assets/batman-attack-left.png', {
 			repeat: 0
 		});
 
-this.anims.create({
-    key: 'vegeta-super-attack-left',
-    frames: this.anims.generateFrameNumbers('vegeta-super-attack-right', { start: 0, end: 11 }),
-    frameRate: 20,
-    repeat: 0
-});
+		this.anims.create({
+			key: 'vegeta-super-attack-left',
+			frames: this.anims.generateFrameNumbers('vegeta-super-attack-right', { start: 0, end: 11 }),
+			frameRate: 20,
+			repeat: 0
+		});
 
 		// Vegeta Idle Animations
-this.anims.create({
-    key: 'vegeta-idle-right',
-    frames: [{ key: 'vegeta-jump', frame: 2 }], // Use the second frame of the jump animation
-    frameRate: 1,
-    repeat: -1
-});
+		this.anims.create({
+			key: 'vegeta-idle-right',
+			frames: [{ key: 'vegeta-jump', frame: 2 }], // Use the second frame of the jump animation
+			frameRate: 1,
+			repeat: -1
+		});
 
-this.anims.create({
-    key: 'vegeta-idle-left',
-    frames: [{ key: 'vegeta-jump', frame: 2 }], // Use the second frame of the jump animation
-    frameRate: 1,
-    repeat: -1
-});
+		this.anims.create({
+			key: 'vegeta-idle-left',
+			frames: [{ key: 'vegeta-jump', frame: 2 }], // Use the second frame of the jump animation
+			frameRate: 1,
+			repeat: -1
+		});
 
 
-// Sasuke Animations
-this.anims.create({
-    key: 'sasuke-move-left',
-    frames: this.anims.generateFrameNumbers('sasuke-move-left', { start: 0, end: 5 }),
-    frameRate: 15,
-    repeat: -1
-});
+		// Sasuke Animations
+		this.anims.create({
+			key: 'sasuke-move-left',
+			frames: this.anims.generateFrameNumbers('sasuke-move-left', { start: 0, end: 5 }),
+			frameRate: 15,
+			repeat: -1
+		});
 
-this.anims.create({
-    key: 'sasuke-jump',
-    frames: this.anims.generateFrameNumbers('sasuke-jump', { start: 0, end: 5 }),
-    frameRate: 10,
-    repeat: 0
-});
+		this.anims.create({
+			key: 'sasuke-jump',
+			frames: this.anims.generateFrameNumbers('sasuke-jump', { start: 0, end: 5 }),
+			frameRate: 10,
+			repeat: 0
+		});
 
-this.anims.create({
-    key: 'sasuke-super-attack-left',
-    frames: this.anims.generateFrameNumbers('sasuke-super-attack-left', { start: 0, end: 6 }),
-    frameRate: 20,
-    repeat: 0
-});
+		this.anims.create({
+			key: 'sasuke-super-attack-left',
+			frames: this.anims.generateFrameNumbers('sasuke-super-attack-left', { start: 0, end: 6 }),
+			frameRate: 20,
+			repeat: 0
+		});
 
-this.anims.create({
-    key: 'sasuke-attack-left',
-    frames: this.anims.generateFrameNumbers('sasuke-attack-left', { start: 0, end: 3 }),
-    frameRate: 20,
-    repeat: 0
-});
+		this.anims.create({
+			key: 'sasuke-attack-left',
+			frames: this.anims.generateFrameNumbers('sasuke-attack-left', { start: 0, end: 3 }),
+			frameRate: 20,
+			repeat: 0
+		});
 
-this.anims.create({
-    key: 'sasuke-idle',
-    frames: [{ key: 'sasuke-move-left', frame: 0 }], // Assuming idle uses the first frame of movement
-    frameRate: 1,
-    repeat: -1
-});
+		this.anims.create({
+			key: 'sasuke-idle',
+			frames: [{ key: 'sasuke-move-left', frame: 0 }], // Assuming idle uses the first frame of movement
+			frameRate: 1,
+			repeat: -1
+		});
 
-this.anims.create({
+		this.anims.create({
 			key: 'batman-move-left',
 			frames: this.anims.generateFrameNumbers('batman-move-left', { start: 0, end: 9 }),
 			frameRate: 15,
@@ -541,65 +646,81 @@ this.anims.create({
 		});
 
 
-this.anims.create({
-    key: 'batman-idle',
-    frames: [{ key: 'batman-super-attack-left', frame: 0 }], // Using the 5th frame for idle
-    frameRate: 1,
-    repeat: -1
-});
+		this.anims.create({
+			key: 'batman-idle',
+			frames: [{ key: 'batman-super-attack-left', frame: 0 }], // Using the 5th frame for idle
+			frameRate: 1,
+			repeat: -1
+		});
 
-// Create player sprites based on selection
-if (this.player1Character === 'vegeta-select') {
-    player1 = this.physics.add.sprite(50, 400, 'vegeta-move-left');
-    player1.play('vegeta-idle-right');
-    player1.flipX = false; // Ensure Player 1 faces right
-} else if (this.player1Character === 'wolverine') {
-    player1 = this.physics.add.sprite(50, 400, 'wolverine-left');
-    player1.play('wolverine-idle-right');
-    player1.flipX = false; // Ensure Player 1 faces right
-} else if (this.player1Character === 'trunks-select') {
-    player1 = this.physics.add.sprite(50, 400, 'trunks-right');
-    player1.play('trunks-idle-right');
-    player1.flipX = false; // Ensure Player 1 faces right
-} else if (this.player1Character === 'sasuke-select') {
-    player1 = this.physics.add.sprite(50, 400, 'sasuke-move-left');
-    player1.play('sasuke-idle');
-    player1.flipX = false; // Ensure Player 1 faces right
-} else if (this.player1Character === 'batman-select') {
-    player1 = this.physics.add.sprite(50, 400, 'batman-super-attack-left');
-    player1.play('batman-idle');
-    player1.flipX = false; // Ensure Player 1 faces right
-} else {
-    player1 = this.physics.add.sprite(50, 400, 'player1');
-    player1.setTexture('player1');
-    player1.flipX = false; // Ensure Player 1 faces right
-}
 
-if (this.player2Character === 'vegeta-select') {
-    player2 = this.physics.add.sprite(450, 400, 'vegeta-move-left');
-    player2.play('vegeta-idle-left');
-    player2.flipX = true; // Ensure Player 2 faces left
-} else if (this.player2Character === 'wolverine') {
-    player2 = this.physics.add.sprite(450, 400, 'wolverine-left');
-    player2.play('wolverine-idle-left');
-    player2.flipX = true; // Ensure Player 2 faces left
-} else if (this.player2Character === 'trunks-select') {
-    player2 = this.physics.add.sprite(450, 400, 'trunks-right');
-    player2.play('trunks-idle-right');
-    player2.flipX = true; // Ensure Player 2 faces left
-} else if (this.player2Character === 'sasuke-select') {
-    player2 = this.physics.add.sprite(450, 400, 'sasuke-move-left');
-    player2.play('sasuke-idle');
-    player2.flipX = true; // Ensure Player 2 faces left
-} else if (this.player2Character === 'batman-select') {
-    player2 = this.physics.add.sprite(450, 400, 'batman-super-attack-left');
-    player2.play('batman-idle');
-    player2.flipX = true; // Ensure Player 2 faces left
-} else {
-    player2 = this.physics.add.sprite(450, 400, 'player2');
-    player2.setTexture('player2');
-    player2.flipX = true; // Ensure Player 2 faces left
-}
+		// Player drop off height
+		const playerDropHeight = 300;
+		// Create player sprites based on selection
+		if (this.player1Character === 'vegeta-select') {
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'vegeta-move-left');
+			player1.play('vegeta-idle-right');
+			player1.flipX = false; // Ensure Player 1 faces right
+		} else if (this.player1Character === 'terminator-select') {
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'terminator-idle-right').setScale(0.4);
+			player1.play('terminator-idle-right');
+			// Since some sprites need scaling , set size for player 1
+			player1.setSize(50, 110);
+			player1.flipX = false; // Ensure Player 1 faces right
+		}
+		else if (this.player1Character === 'wolverine') {
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'wolverine-left');
+			player1.play('wolverine-idle-right');
+			player1.flipX = false; // Ensure Player 1 faces right
+		} else if (this.player1Character === 'trunks-select') {
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'trunks-right');
+			player1.play('trunks-idle-right');
+			player1.flipX = false; // Ensure Player 1 faces right
+		} else if (this.player1Character === 'sasuke-select') {
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'sasuke-move-left');
+			player1.play('sasuke-idle');
+			player1.flipX = false; // Ensure Player 1 faces right
+		} else if (this.player1Character === 'batman-select') {
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'batman-super-attack-left');
+			player1.play('batman-idle');
+			player1.flipX = false; // Ensure Player 1 faces right
+		} else {
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'player1');
+			player1.setTexture('player1');
+			player1.flipX = false; // Ensure Player 1 faces right
+		}
+
+
+		if (this.player2Character === 'vegeta-select') {
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'vegeta-move-left');
+			player2.play('vegeta-idle-left');
+			player2.flipX = true; // Ensure Player 2 faces left
+		} else if (this.player2Character === 'terminator-select') {
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'terminator-idle-right');
+			player2.play('terminator-idle-right');
+			player2.flipX = true; // Ensure Player 2 faces left
+		}
+		else if (this.player2Character === 'wolverine') {
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'wolverine-left');
+			player2.play('wolverine-idle-left');
+			player2.flipX = true; // Ensure Player 2 faces left
+		} else if (this.player2Character === 'trunks-select') {
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'trunks-right');
+			player2.play('trunks-idle-right');
+			player2.flipX = true; // Ensure Player 2 faces left
+		} else if (this.player2Character === 'sasuke-select') {
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'sasuke-move-left');
+			player2.play('sasuke-idle');
+			player2.flipX = true; // Ensure Player 2 faces left
+		} else if (this.player2Character === 'batman-select') {
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'batman-super-attack-left');
+			player2.play('batman-idle');
+			player2.flipX = true; // Ensure Player 2 faces left
+		} else {
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'player2');
+			player2.setTexture('player2');
+			player2.flipX = true; // Ensure Player 2 faces left
+		}
 
 
 
@@ -621,23 +742,63 @@ if (this.player2Character === 'vegeta-select') {
 			return `tile_${String(randomIndex).padStart(4, "0")}`;
 		}
 
-		// Map setup (same as before)
-		platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
-		platforms.create(130, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
-        platforms.create(380, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
-		platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
-        platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
-        platforms.create(250, 300, getRandomTile()).setScale(10, 1).refreshBody(); // Right upper middle platform
-		// Upper Platforms - High-Level for Aerial Combat
-        platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
-        platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
-		platforms.create(334, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
-        platforms.create(160, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+		function generateMap() {
+			const random_map = Math.floor(Math.random() * 3);			
 
+			switch (random_map) {
+				case 0:
+					platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
+					platforms.create(130, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
+					platforms.create(380, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
+					platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
+					platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
+					platforms.create(250, 300, getRandomTile()).setScale(10, 1).refreshBody(); // Right upper middle platform
+					// Upper Platforms - High-Level for Aerial Combat
+					platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+					platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+					platforms.create(334, 120, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+					platforms.create(160, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+					// Super Jump Platforms at the Bottom Left and Right
+					platforms.create(50, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+					platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+					break;
+				case 1:
+					platforms.create(160, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(334, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(458, 220, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+					platforms.create(54, 220, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+					platforms.create(90, 300, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
+					platforms.create(420, 300, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
+					platforms.create(250, 300, getRandomTile()).setScale(8, 1).refreshBody(); // middle platform
+					// Upper Platforms - High-Level for Aerial Combat
+					platforms.create(330, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
+					platforms.create(150, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
+					platforms.create(230, 464, getRandomTile()).setScale(13, 1).refreshBody(); // Central base platform
+					// // Super Jump Platforms at the Bottom Left and Right
+					platforms.create(50, 444, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+					platforms.create(448, 444, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+					break;
+				case 2:
+					platforms.create(160, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(334, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(458, 220, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+					platforms.create(54, 220, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+					platforms.create(50, 300, getRandomTile()).setScale(4, 1).refreshBody(); // Left upper middle platform
+					platforms.create(420, 300, getRandomTile()).setScale(4, 1).refreshBody(); // Right upper middle platform
+					platforms.create(250, 300, getRandomTile()).setScale(8, 1).refreshBody(); // middle platform
+					// Upper Platforms - High-Level for Aerial Combat
+					platforms.create(380, 380, getRandomTile()).setScale(2, 1).refreshBody(); // Right middle platform
+					platforms.create(100, 380, getRandomTile()).setScale(2, 1).refreshBody(); // Left middle platform
+					platforms.create(250, 454, getRandomTile()).setScale(11, 1).refreshBody(); // Central base platform
+					// // Super Jump Platforms at the Bottom Left and Right
+					platforms.create(20, 454, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+					platforms.create(468, 454, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+					break;
+			}
+		}
+		// Generate the map of the tiles
+		generateMap();		
 
-		// Super Jump Platforms at the Bottom Left and Right
-		const leftSuperJump = platforms.create(50, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
-        const rightSuperJump = platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
 		// Lava and traps setup
 		const lava = this.physics.add.staticGroup();
 		lava.create(256, 478, "lava").setScale(32, 0.5).refreshBody();
@@ -676,8 +837,8 @@ if (this.player2Character === 'vegeta-select') {
 		player2.speedMultiplier = 1;
 		player2.setGravityY(-300);
 
-player1.mana = player1Mana;
-player2.mana = player2Mana;
+		player1.mana = player1Mana;
+		player2.mana = player2Mana;
 
 
 		// Add collision between players and platforms, traps, and lava
@@ -754,29 +915,29 @@ player2.mana = player2Mana;
 		this.cameras.main.startFollow(player1);
 	}
 
-update() {
-    if (gameOver) return;
+	update() {
+		if (gameOver) return;
 
-    // Handle player movement
-    handlePlayerMovement(player1, { jump: keys.W, left: keys.A, right: keys.D });
-    handlePlayerMovement(player2, { jump: cursors.up, left: cursors.left, right: cursors.right });
+		// Handle player movement
+		handlePlayerMovement(player1, { jump: keys.W, left: keys.A, right: keys.D });
+		handlePlayerMovement(player2, { jump: cursors.up, left: cursors.left, right: cursors.right });
 
-    // Adjust facing direction based on the opponent's position
-    adjustDirectionBasedOnOpponent(player1, player2);
-    adjustDirectionBasedOnOpponent(player2, player1);
+		// Adjust facing direction based on the opponent's position
+		adjustDirectionBasedOnOpponent(player1, player2);
+		adjustDirectionBasedOnOpponent(player2, player1);
 
-    // Manage attacks for both players
-    manageAttacks.call(this);
-}
-}
-	function hitLava(player, lava) {
-		if (!gameOver) {
-			console.log(
-				(player === player1 ? "Player 1" : "Player 2") + " fell into the lava. Instant Game Over."
-			);
-			endGame.call(this, player === player1 ? "Player 2" : "Player 1");
-		}
+		// Manage attacks for both players
+		manageAttacks.call(this);
 	}
+}
+function hitLava(player, lava) {
+	if (!gameOver) {
+		console.log(
+			(player === player1 ? "Player 1" : "Player 2") + " fell into the lava. Instant Game Over."
+		);
+		endGame.call(this, player === player1 ? "Player 2" : "Player 1");
+	}
+}
 
     function hitTrap(player, trap) {
         if (!player.trapContact) {
@@ -787,7 +948,7 @@ update() {
             player.setVelocityY(0);
             player.body.moves = false;
     
-            this.time.delayedCall(1000, () => {
+            this.time.delayedCall(1500, () => {
                 player.body.moves = true;
                 player.trapContact = false;
                 console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
@@ -798,7 +959,7 @@ update() {
             // Make the trap disappear and respawn after 2 seconds
             trap.setActive(false).setVisible(false);
     
-            this.time.delayedCall(4000, () => {
+            this.time.delayedCall(2000, () => {
                 respawnTrap(trap, this);
             }, [], this);
         }
@@ -816,30 +977,30 @@ update() {
 
 
 function adjustDirectionBasedOnOpponent(player, opponent) {
-    // Determine the character of the player
-    const isSpecialCharacter = player.texture.key.includes('sasuke') || 
-                               player.texture.key.includes('batman') || 
-                               player.texture.key.includes('wolverine');
-    
-    if (isSpecialCharacter) {
-        // For Sasuke, Batman, and Wolverine
-        if (player.x < opponent.x) {
-            // Face right
-            player.flipX = false;
-        } else {
-            // Face left
-            player.flipX = true;
-        }
-    } else {
-        // For all other characters
-        if (player.x < opponent.x) {
-            // Face right
-            player.flipX = true;
-        } else {
-            // Face left
-            player.flipX = false;
-        }
-    }
+	// Determine the character of the player
+	const isSpecialCharacter = player.texture.key.includes('sasuke') ||
+		player.texture.key.includes('batman') ||
+		player.texture.key.includes('wolverine');
+
+	if (isSpecialCharacter) {
+		// For Sasuke, Batman, and Wolverine
+		if (player.x < opponent.x) {
+			// Face right
+			player.flipX = false;
+		} else {
+			// Face left
+			player.flipX = true;
+		}
+	} else {
+		// For all other characters
+		if (player.x < opponent.x) {
+			// Face right
+			player.flipX = true;
+		} else {
+			// Face left
+			player.flipX = false;
+		}
+	}
 }
 function collectItem(player, item) {
 	if (!item || !item.getData("key")) {
@@ -930,7 +1091,11 @@ function handlePlayerMovement(player, controls) {
 	if (controls.jump.isDown && player.body.blocked.down) {
 		player.setVelocityY(-player.jumpHeight);
 		player.state = 'jumping';
-		playAnimation(player, 'jump');
+		if (player.flipX === true) {
+			playAnimation(player, 'jump-left');
+		} else {
+			playAnimation(player, 'jump-right');
+		}
 	} else if (player.state === 'jumping' && player.body.blocked.down) {
 		// Transition from jumping to idle or move based on input
 		player.state = 'idle';
@@ -943,6 +1108,7 @@ function handlePlayerMovement(player, controls) {
 		if (player.state !== 'jumping') {
 			player.state = 'moving';
 			playAnimation(player, 'move-left');
+			player.flipX = true;
 		}
 		player.flipX = true;
 	} else if (controls.right.isDown) {
@@ -950,6 +1116,7 @@ function handlePlayerMovement(player, controls) {
 		if (player.state !== 'jumping') {
 			player.state = 'moving';
 			playAnimation(player, 'move-right');
+			player.flipX = false;
 		}
 		player.flipX = false;
 	} else if (player.body.blocked.down && player.state !== 'jumping') {
@@ -965,33 +1132,47 @@ function handlePlayerMovement(player, controls) {
 }
 
 function playAnimation(player, action) {
+	console.log("Player animation: " + action);
+
 	const characterAnimations = {
+		'terminator': {
+			'jump-right': 'terminator-jump-right',
+			'jump-left': 'terminator-jump-left',
+			'move-left': 'terminator-walk-left',
+			'move-right': 'terminator-walk-right',
+			'idle': 'terminator-idle-right'
+		},
 		'wolverine': {
-			'jump': 'wolverine-jump',
+			'jump-right': 'wolverine-jump',
+			'jump-left': 'wolverine-jump',
 			'move-left': 'wolverine-move-right',
 			'move-right': 'wolverine-move-right',
 			'idle': 'wolverine-idle-right'
 		},
 		'trunks': {
-			'jump': 'trunks-jump-right',
+			'jump-right': 'trunks-jump-right',
+			'jump-left': 'trunks-jump-right',
 			'move-left': 'trunks-move-left',
 			'move-right': 'trunks-move-right',
 			'idle': 'trunks-idle-right'
 		},
 		'vegeta': {
-			'jump': 'vegeta-jump',
+			'jump-right': 'vegeta-jump',
+			'jump-left': 'vegeta-jump',
 			'move-left': 'vegeta-move-left',
 			'move-right': 'vegeta-move-left',
 			'idle': 'vegeta-idle-right'
 		},
 		'sasuke': {
-			'jump': 'sasuke-jump',
+			'jump-right': 'sasuke-jump',
+			'jump-left': 'sasuke-jump',
 			'move-left': 'sasuke-move-left',
-			'move-right': 'sasuke-move-left', 
+			'move-right': 'sasuke-move-left',
 			'idle': 'sasuke-idle'
 		},
 		'batman': {
-			'jump': 'batman-jump',
+			'jump-right': 'batman-jump',
+			'jump-left': 'batman-jump',
 			'move-left': 'batman-move-left',
 			'move-right': 'batman-move-left', // Batman only has left animations, so reuse them
 			'idle': 'batman-idle'
@@ -1001,10 +1182,13 @@ function playAnimation(player, action) {
 	// Determine the character key from the player's texture
 	const animKey = player.texture.key.includes('wolverine') ? 'wolverine' :
 		player.texture.key.includes('trunks') ? 'trunks' :
-		player.texture.key.includes('sasuke') ? 'sasuke' :
-		player.texture.key.includes('batman') ? 'batman' : 'vegeta';
+			player.texture.key.includes('sasuke') ? 'sasuke' :
+				player.texture.key.includes('batman') ? 'batman' :
+					player.texture.key.includes('terminator') ? 'terminator' : 'vegeta';
 
 	const animation = characterAnimations[animKey][action];
+	// Play the animation
+	console.log("Player animation: " + animation);
 	player.play(animation, true);
 
 	// Ensure correct flipping for left movement
@@ -1014,94 +1198,88 @@ function playAnimation(player, action) {
 
 }
 
-  
+
 
 
 function manageAttacks() {
-
-    player1.mana = player1Mana;
-    player2.mana = player2Mana;
-
     if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
         lastPlayer1AttackTime = this.time.now; // Update last attack time
         handleAttack.call(this, player1, player2, 'regular');
     }
 
-    if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
-        lastPlayer1AttackTime = this.time.now; // Update last attack time
-        handleAttack.call(this, player1, player2, 'super');
-    }
+	if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
+		lastPlayer1AttackTime = this.time.now; // Update last attack time
+		handleAttack.call(this, player1, player2, 'super');
+	}
 
-    if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
-        lastPlayer2AttackTime = this.time.now; // Update last attack time
-        handleAttack.call(this, player2, player1, 'regular');
-    }
+	if (Phaser.Input.Keyboard.JustDown(cursors.down) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+		lastPlayer2AttackTime = this.time.now; // Update last attack time
+		handleAttack.call(this, player2, player1, 'regular');
+	}
 
-    if (Phaser.Input.Keyboard.JustDown(keys.NUMPAD_ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
-        lastPlayer2AttackTime = this.time.now; // Update last attack time
-        handleAttack.call(this, player2, player1, 'super');
-    }
+	if (Phaser.Input.Keyboard.JustDown(keys.NUMPAD_ONE) && this.time.now > lastPlayer2AttackTime + attackDelay) {
+		lastPlayer2AttackTime = this.time.now; // Update last attack time
+		handleAttack.call(this, player2, player1, 'super');
+	}
 }
 function handleAttack(attacker, target, type) {
-    const attackCosts = { 'regular': 20, 'super': 50 };
-    const animations = {
-        'wolverine': {
-            'regular': attacker.flipX ? 'wolverine-basic-attack-left' : 'wolverine-basic-attack-right',
-            'super': attacker.flipX ? 'wolverine-super-attack-left' : 'wolverine-super-attack-right'
-        },
-        'trunks': {
-            'regular': attacker.flipX ? 'trunks-basic-attack-left' : 'trunks-basic-attack-right',
-            'super': attacker.flipX ? 'trunks-super-attack-left' : 'trunks-super-attack-right'
-        },
-        'vegeta': {
-            'regular': 'vegeta-basic-attack-right', // Start with right attack
-            'super': 'vegeta-super-attack-right'    // Start with right super attack
-        },
-        'sasuke': {
-            'regular': attacker.flipX ? 'sasuke-attack-left' : 'sasuke-attack-left',
-            'super': attacker.flipX ? 'sasuke-super-attack-left' : 'sasuke-super-attack-left'
-        },
-        'batman': {
-            'regular': 'batman-attack-left',
-            'super': 'batman-attack-left'
-        }
-    };
+	const attackCosts = { 'regular': 20, 'super': 50 };
+	const animations = {
+		'terminator': {
+			'regular': attacker.flipX ? 'terminator-attack-left' : 'terminator-attack-right',
+			'super': attacker.flipX ? 'terminator-super-attack-left' : 'terminator-super-attack-right'
+		},
+		'wolverine': {
+			'regular': attacker.flipX ? 'wolverine-basic-attack-left' : 'wolverine-basic-attack-right',
+			'super': attacker.flipX ? 'wolverine-super-attack-left' : 'wolverine-super-attack-right'
+		},
+		'trunks': {
+			'regular': attacker.flipX ? 'trunks-basic-attack-left' : 'trunks-basic-attack-right',
+			'super': attacker.flipX ? 'trunks-super-attack-left' : 'trunks-super-attack-right'
+		},
+		'vegeta': {
+			'regular': 'vegeta-basic-attack-right', // Start with right attack
+			'super': 'vegeta-super-attack-right'    // Start with right super attack
+		},
+		'sasuke': {
+			'regular': attacker.flipX ? 'sasuke-attack-left' : 'sasuke-attack-left',
+			'super': attacker.flipX ? 'sasuke-super-attack-left' : 'sasuke-super-attack-left'
+		},
+		'batman': {
+			'regular': 'batman-attack-left',
+			'super': 'batman-attack-left'
+		}
+	};
 
-    const animKey = attacker.texture.key.includes('wolverine') ? 'wolverine' :
-        attacker.texture.key.includes('trunks') ? 'trunks' :
-        attacker.texture.key.includes('sasuke') ? 'sasuke' :
-        attacker.texture.key.includes('batman') ? 'batman' : 'vegeta';
+	const animKey = attacker.texture.key.includes('wolverine') ? 'wolverine' :
+		attacker.texture.key.includes('trunks') ? 'trunks' :
+			attacker.texture.key.includes('sasuke') ? 'sasuke' :
+				attacker.texture.key.includes('batman') ? 'batman' : 
+					attacker.texture.key.includes('terminator') ? 'terminator' : 'vegeta';						
 
-    const animation = animations[animKey][type];
-    const manaCost = attackCosts[type];
+	const animation = animations[animKey][type];
+	const manaCost = attackCosts[type];
 
     if (attacker.mana >= manaCost) {
         attacker.mana -= manaCost;
-
-        // Update the global mana variables
-        if (attacker === player1) {
-            player1Mana = attacker.mana;
-        } else if (attacker === player2) {
-            player2Mana = attacker.mana;
-        }
-
+        
         if (type === 'regular' || type === 'super') {
             this.gameSounds[`${type}Attack`].play();
             activateHitbox.call(this, attacker, target, type === 'regular' ? 10 : 25);
 
-            // Play the right-side attack first, then flip to left
-            attacker.play(animation, true).on('animationcomplete', () => {
-                if (animKey === 'vegeta') {
-                    attacker.flipX = !attacker.flipX; // Flip the sprite
-                    attacker.play(attacker.flipX ? 'vegeta-basic-attack-left' : 'vegeta-basic-attack-right', true);
-                }
-            });
-        }
+			// Play the right-side attack first, then flip to left
+			attacker.play(animation, true).on('animationcomplete', () => {
+				if (animKey === 'vegeta') {
+					attacker.flipX = !attacker.flipX; // Flip the sprite
+					attacker.play(attacker.flipX ? 'vegeta-basic-attack-left' : 'vegeta-basic-attack-right', true);
+				}
+			});
+		}
 
-        drawManaBar(attacker === player1 ? player1ManaBar : player2ManaBar, attacker.mana);
-    } else {
-        console.log('Not enough mana for attack:', type);
-    }
+		drawManaBar(attacker === player1 ? player1ManaBar : player2ManaBar, attacker.mana);
+	} else {
+		console.log('Not enough mana for attack:', type);
+	}
 }
 
 
