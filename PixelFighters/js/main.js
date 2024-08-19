@@ -705,9 +705,10 @@ class MainGame extends Phaser.Scene {
 			player2.play('vegeta-idle-left');
 			player2.flipX = true; // Ensure Player 2 faces left
 		} else if (this.player2Character === 'terminator-select') {
-			player2 = this.physics.add.sprite(450, playerDropHeight, 'terminator-idle-right');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'terminator-idle-right').setScale(0.4);
 			player2.play('terminator-idle-right');
-			player2.flipX = true; // Ensure Player 2 faces left
+			player2.flipX = true;
+			player2.setSize(50, 110); // Ensure Player 2 faces left
 		}
 		else if (this.player2Character === 'wolverine') {
 			player2 = this.physics.add.sprite(450, playerDropHeight, 'wolverine-left');
@@ -1269,12 +1270,19 @@ function handleAttack(attacker, target, type) {
 	const animation = animations[animKey][type];
 	const manaCost = attackCosts[type];
 
-	if (attacker.mana >= manaCost) {
-		attacker.mana -= manaCost;
+    if (attacker.mana >= manaCost) {
+        attacker.mana -= manaCost;
 
-		if (type === 'regular' || type === 'super') {
-			this.gameSounds[`${type}Attack`].play();
-			activateHitbox.call(this, attacker, target, type === 'regular' ? 10 : 25);
+		        // Update the global mana variables
+        if (attacker === player1) {
+            player1Mana = attacker.mana;
+        } else if (attacker === player2) {
+            player2Mana = attacker.mana;
+        }
+        
+        if (type === 'regular' || type === 'super') {
+            this.gameSounds[`${type}Attack`].play();
+            activateHitbox.call(this, attacker, target, type === 'regular' ? 10 : 25);
 
 			// Play the right-side attack first, then flip to left
 			attacker.play(animation, true).on('animationcomplete', () => {
@@ -1414,16 +1422,16 @@ function drawManaBar(graphics, mana) {
 
 // Recharge mana for both players every 5 seconds
 function rechargeMana() {
-	if (player1Mana < 100) {
-		player1Mana = Math.min(player1Mana + 30, 100);
-		drawManaBar(player1ManaBar, player1Mana); // Update mana bar
-		console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
-	}
-	if (player2Mana < 100) {
-		player2Mana = Math.min(player2Mana + 20, 100);
-		drawManaBar(player2ManaBar, player2Mana); // Update mana bar
-		console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
-	}
+   if (player1Mana < 100) {
+        player1Mana = Math.min(player1Mana + 30, 100);
+        drawManaBar(player1ManaBar, player1Mana); // Update mana bar
+        console.log(`Player 1 Mana recharged. Current Mana: ${player1Mana}`);
+    }
+    if (player2Mana < 100) {
+        player2Mana = Math.min(player2Mana + 30, 100);
+        drawManaBar(player2ManaBar, player2Mana); // Update mana bar
+        console.log(`Player 2 Mana recharged. Current Mana: ${player2Mana}`);
+    }
 }
 
 // End the game and declare a winner
