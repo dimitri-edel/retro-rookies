@@ -125,9 +125,9 @@ Simply open `index.html` in a web browser to play the game.
   Background music and sound effects downloaded from [Pixabay](https://pixabay.com/)
   ## Team
   - Dimitri Edel [GitHub](https://github.com/dimitri-edel)
-  - Liam Goddard [GitHub](https://www.github.com/caleom)
+ 
   - Maushum Gurrung [GitHub](https://github.com/grgmausham)
-  - Laura Masterton [GitHub](https://www.github.com/Laura-Masterton)
+  
   - Jesse Lee Ross[GitHub](https://www.github.com/jesseross001)
   - Robert Quinlan[GitHub](https://github.com/RQISL)
   

@@ -19,9 +19,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
 </head>
 <body>
-<img src="assets/Logo/Repro Rookie Logo_1.png" class="img-fluid logo_img" alt="Design of logo with network side of text 'Repro Rookies'">
+<img src="assets/Logo/Repro_Rookie_Logo_1.png" class="img-fluid logo_img" alt="Design of logo with network side of text 'Repro Rookies'">
 
-<div class="container">
+<div class="container py-5">
     <div class="title"><img src="assets/Logo/Logo_1.png" class="img-fluid" alt="Throwback logo with pixels marvel characters arts"></div>
     
     <button class="button" id="startButton">Start</button>
@@ -29,14 +29,84 @@
     <button class="button" id="aboutButton">About</button>
     
 </div>
+<!-- Modals for each team member -->
+<div class="modal fade" id="modalJesse" tabindex="-1" aria-labelledby="modalJesseLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalJesseLabel">Jesse Lee Ross - Game Architect</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Majority of game logic 
+                <br><br>
+                <a href="https://www.github.com/jesseross001" target="_blank">Visit GitHub Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="modalRobert" tabindex="-1" aria-labelledby="modalRobertLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalRobertLabel">Robert Quinlan - Documentation and Graphics Design</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Contributed to styling, wireframing, and logo design.
+                <br><br>
+                <a href="https://github.com/RQISL" target="_blank">Visit GitHub Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalDimitri" tabindex="-1" aria-labelledby="modalDimitriLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalDimitriLabel">Dimitri Edel - Scrum Master</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Handled sprite movements, about page, background, and map planning.
+                <br><br>
+                <a href="https://github.com/dimitri-edel" target="_blank">Visit GitHub Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modalMaushum" tabindex="-1" aria-labelledby="modalMaushumLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalMaushumLabel">Maushum Gurrung - UI/UX Designer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Responsible for color scheme choices, trap logic, and initial page designs.
+                <br><br>
+                <a href="https://github.com/grgmausham" target="_blank">Visit GitHub Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
 <footer>
     <h6>Hackathon Team 4 2024</h6>
-    <a href="#"><img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="logo github link to active profiles."></a>
-    <a href="#"><img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="logo github link to active profiles."></a>
-    <a href="#"><img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="logo github link to active profiles."></a>
-    <a href="#"><img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="logo github link to active profiles."></a>
-    <a href="#"><img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="logo github link to active profiles."></a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modalJesse">
+        <img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="GitHub link for Jesse Lee Ross">
+    </a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modalRobert">
+        <img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="GitHub link for Robert Quinlan">
+    </a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modalDimitri">
+        <img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="GitHub link for Dimitri Edel">
+    </a>
+    <a href="#" data-bs-toggle="modal" data-bs-target="#modalMaushum">
+        <img src="assets/Logo/github-mark.png" class="img-fluid github_logo" alt="GitHub link for Maushum Gurrung">
+    </a>
 </footer>
 
 <script>
@@ -52,5 +122,7 @@
         window.location.href = 'about.html';
     };
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"></script>
 </body>
 </html>
