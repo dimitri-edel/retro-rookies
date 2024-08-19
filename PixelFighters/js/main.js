@@ -654,69 +654,70 @@ class MainGame extends Phaser.Scene {
 		});
 
 
-
+		// Player drop off height
+		const playerDropHeight = 300;
 		// Create player sprites based on selection
 		if (this.player1Character === 'vegeta-select') {
-			player1 = this.physics.add.sprite(50, 400, 'vegeta-move-left');
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'vegeta-move-left');
 			player1.play('vegeta-idle-right');
 			player1.flipX = false; // Ensure Player 1 faces right
 		} else if (this.player1Character === 'terminator-select') {
-			player1 = this.physics.add.sprite(50, 400, 'terminator-idle-right').setScale(0.4);
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'terminator-idle-right').setScale(0.4);
 			player1.play('terminator-idle-right');
 			// Since some sprites need scaling , set size for player 1
 			player1.setSize(50, 110);
 			player1.flipX = false; // Ensure Player 1 faces right
 		}
 		else if (this.player1Character === 'wolverine') {
-			player1 = this.physics.add.sprite(50, 400, 'wolverine-left');
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'wolverine-left');
 			player1.play('wolverine-idle-right');
 			player1.flipX = false; // Ensure Player 1 faces right
 		} else if (this.player1Character === 'trunks-select') {
-			player1 = this.physics.add.sprite(50, 400, 'trunks-right');
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'trunks-right');
 			player1.play('trunks-idle-right');
 			player1.flipX = false; // Ensure Player 1 faces right
 		} else if (this.player1Character === 'sasuke-select') {
-			player1 = this.physics.add.sprite(50, 400, 'sasuke-move-left');
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'sasuke-move-left');
 			player1.play('sasuke-idle');
 			player1.flipX = false; // Ensure Player 1 faces right
 		} else if (this.player1Character === 'batman-select') {
-			player1 = this.physics.add.sprite(50, 400, 'batman-super-attack-left');
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'batman-super-attack-left');
 			player1.play('batman-idle');
 			player1.flipX = false; // Ensure Player 1 faces right
 		} else {
-			player1 = this.physics.add.sprite(50, 400, 'player1');
+			player1 = this.physics.add.sprite(50, playerDropHeight, 'player1');
 			player1.setTexture('player1');
 			player1.flipX = false; // Ensure Player 1 faces right
 		}
 
 
 		if (this.player2Character === 'vegeta-select') {
-			player2 = this.physics.add.sprite(450, 400, 'vegeta-move-left');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'vegeta-move-left');
 			player2.play('vegeta-idle-left');
 			player2.flipX = true; // Ensure Player 2 faces left
 		} else if (this.player2Character === 'terminator-select') {
-			player2 = this.physics.add.sprite(450, 400, 'terminator-idle-right');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'terminator-idle-right');
 			player2.play('terminator-idle-right');
 			player2.flipX = true; // Ensure Player 2 faces left
 		}
 		else if (this.player2Character === 'wolverine') {
-			player2 = this.physics.add.sprite(450, 400, 'wolverine-left');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'wolverine-left');
 			player2.play('wolverine-idle-left');
 			player2.flipX = true; // Ensure Player 2 faces left
 		} else if (this.player2Character === 'trunks-select') {
-			player2 = this.physics.add.sprite(450, 400, 'trunks-right');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'trunks-right');
 			player2.play('trunks-idle-right');
 			player2.flipX = true; // Ensure Player 2 faces left
 		} else if (this.player2Character === 'sasuke-select') {
-			player2 = this.physics.add.sprite(450, 400, 'sasuke-move-left');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'sasuke-move-left');
 			player2.play('sasuke-idle');
 			player2.flipX = true; // Ensure Player 2 faces left
 		} else if (this.player2Character === 'batman-select') {
-			player2 = this.physics.add.sprite(450, 400, 'batman-super-attack-left');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'batman-super-attack-left');
 			player2.play('batman-idle');
 			player2.flipX = true; // Ensure Player 2 faces left
 		} else {
-			player2 = this.physics.add.sprite(450, 400, 'player2');
+			player2 = this.physics.add.sprite(450, playerDropHeight, 'player2');
 			player2.setTexture('player2');
 			player2.flipX = true; // Ensure Player 2 faces left
 		}
@@ -741,23 +742,63 @@ class MainGame extends Phaser.Scene {
 			return `tile_${String(randomIndex).padStart(4, "0")}`;
 		}
 
-		// Map setup (same as before)
-		platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
-		platforms.create(130, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
-		platforms.create(380, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
-		platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
-		platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
-		platforms.create(250, 300, getRandomTile()).setScale(10, 1).refreshBody(); // Right upper middle platform
-		// Upper Platforms - High-Level for Aerial Combat
-		platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
-		platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
-		platforms.create(334, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
-		platforms.create(160, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+		function generateMap() {
+			const random_map = Math.floor(Math.random() * 3);			
 
+			switch (random_map) {
+				case 0:
+					platforms.create(256, 464, getRandomTile()).setScale(12, 1).refreshBody(); // Central base platform
+					platforms.create(130, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
+					platforms.create(380, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
+					platforms.create(128, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
+					platforms.create(384, 350, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
+					platforms.create(250, 300, getRandomTile()).setScale(10, 1).refreshBody(); // Right upper middle platform
+					// Upper Platforms - High-Level for Aerial Combat
+					platforms.create(64, 260, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+					platforms.create(448, 260, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+					platforms.create(334, 120, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+					platforms.create(160, 150, getRandomTile()).setScale(2, 1).refreshBody(); // Central high platform
+					// Super Jump Platforms at the Bottom Left and Right
+					platforms.create(50, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+					platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+					break;
+				case 1:
+					platforms.create(160, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(334, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(458, 220, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+					platforms.create(54, 220, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+					platforms.create(90, 300, getRandomTile()).setScale(2, 1).refreshBody(); // Left upper middle platform
+					platforms.create(420, 300, getRandomTile()).setScale(2, 1).refreshBody(); // Right upper middle platform
+					platforms.create(250, 300, getRandomTile()).setScale(8, 1).refreshBody(); // middle platform
+					// Upper Platforms - High-Level for Aerial Combat
+					platforms.create(330, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Right middle platform
+					platforms.create(150, 380, getRandomTile()).setScale(4, 1).refreshBody(); // Left middle platform
+					platforms.create(230, 464, getRandomTile()).setScale(13, 1).refreshBody(); // Central base platform
+					// // Super Jump Platforms at the Bottom Left and Right
+					platforms.create(50, 444, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+					platforms.create(448, 444, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+					break;
+				case 2:
+					platforms.create(160, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(334, 150, getRandomTile()).setScale(6, 1).refreshBody(); // Central high platform
+					platforms.create(458, 220, getRandomTile()).setScale(2, 1).refreshBody(); // Upper right platform
+					platforms.create(54, 220, getRandomTile()).setScale(2, 1).refreshBody();  // Upper left platform
+					platforms.create(50, 300, getRandomTile()).setScale(4, 1).refreshBody(); // Left upper middle platform
+					platforms.create(420, 300, getRandomTile()).setScale(4, 1).refreshBody(); // Right upper middle platform
+					platforms.create(250, 300, getRandomTile()).setScale(8, 1).refreshBody(); // middle platform
+					// Upper Platforms - High-Level for Aerial Combat
+					platforms.create(380, 380, getRandomTile()).setScale(2, 1).refreshBody(); // Right middle platform
+					platforms.create(100, 380, getRandomTile()).setScale(2, 1).refreshBody(); // Left middle platform
+					platforms.create(250, 454, getRandomTile()).setScale(11, 1).refreshBody(); // Central base platform
+					// // Super Jump Platforms at the Bottom Left and Right
+					platforms.create(20, 454, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
+					platforms.create(468, 454, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
+					break;
+			}
+		}
+		// Generate the map of the tiles
+		generateMap();		
 
-		// Super Jump Platforms at the Bottom Left and Right
-		const leftSuperJump = platforms.create(50, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Left super jump platform
-		const rightSuperJump = platforms.create(448, 464, getRandomTile()).setScale(4, 1).refreshBody(); // Right super jump platform
 		// Lava and traps setup
 		const lava = this.physics.add.staticGroup();
 		lava.create(256, 478, "lava").setScale(32, 0.5).refreshBody();
