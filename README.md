@@ -51,42 +51,44 @@ Simply open `index.html` in a web browser to play the game.
 ## Design
 
 ### Logo Design
-- The two logos design are idea for the game name and our team logo. 
-  1. The logo game design as pixel font and marvel characters to display on the each pages
-    -  <img src="PixelFighters/assets/Logo/Logo_1.png" alt="Design logo called Throwback with pixel fonts and side of the marvel characters">
-  2. Our team logo design, it design the logo with image of network which the way we are network through Github team to work together. Our called name "Retro Rookies"
-    -  <img src="PixelFighters/assets/Logo/Repro Rookie Logo_1.png" alt="Design logo called Retro Rookies with image of netwrok with system" style="width:600px">
+- We have two logo designs, one for the game and one for our team:
+  1. The game logo features pixel font and Marvel characters and will be displayed on every page.
+    -  <img src="PixelFighters/assets/Logo/Logo_1.png" alt="Design logo called Throwback with pixel fonts and Marvel characters">
+  2. Our team logo includes an image of a network representing how we collaborate through GitHub as a team. Our team name is "Retro Rookies"
+    -  <img src="PixelFighters/assets/Logo/Repro_Rookie_Logo_1.png" alt="Design logo called Retro Rookies with an image of a network" style="width:600px">
 
 ### Wireframes
-- The wireframe are draft idea for the Throwback game pages. Please see atached images to click drowdown to see image.
+- The wireframe is a preliminary design for the Throwback game pages. Please refer to the attached images below to view the wireframes:
 * 
   <details>
     <summary>Home page</summary>
-    <img src="PixelFighters/assets/ReadMe_images/Wireframe1.jpg" alt="Wifreframe home page">
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe1.jpg" alt="Wireframe home page">
   </details>
 
 * 
   <details>
     <summary>Game page</summary>
-    <img src="PixelFighters/assets/ReadMe_images/Wireframe3.jpg" alt="Wifreframe Game page">
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe3.jpg" alt="Wireframe Game page">
   </details>
 
 * 
   <details>
     <summary>How to play page</summary>
-    <img src="PixelFighters/assets/ReadMe_images/Wireframe2.jpg" alt="Wifreframe How to play page">
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe2.jpg" alt="Wireframe How to play page">
   </details>
 
 * 
   <details>
     <summary>About page</summary>
-    <img src="PixelFighters/assets/ReadMe_images/Wireframe4.jpg" alt="Wifreframe About page">
+    <img src="PixelFighters/assets/ReadMe_images/Wireframe4.jpg" alt="Wireframe About page">
   </details>
 
 ### Colour scheme
 ### Font
 
-- I used font by google font, The font is [Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans?query=Pixel). It is all inclued pages. 
+- I used the Google font "Pixelify Sans" across all pages. You can find the font [Pixelify Sans](https://fonts.google.com/specimen/Pixelify+Sans?query=Pixel).
+
+
 
 ## Accessibility
 - The CSS framework Bootstrap is used to provide a responsive experience across devices of various sizes.  
