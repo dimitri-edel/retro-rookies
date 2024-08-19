@@ -110,9 +110,9 @@ class MainGame extends Phaser.Scene {
 	}
 
 	preload() {
-		// Load assets based on selected characters
+		// Load background images
 		this.load.image("background", "assets/sprites/background.png");
-
+		this.load.image("background2", "assets/sprites/background2.png");
 
 		// Load the spritesheets for the selected characters
 		// Terminator spritesheets
@@ -292,10 +292,19 @@ class MainGame extends Phaser.Scene {
 	}
 
 	create() {
-		// Add and scale the background
-		const background = this.add.image(256, 240, "background");
-		background.setScale(4);
 
+		const getBackgroundImage = () => {
+			const randomBackground = Math.floor(Math.random() * 2);
+			switch (randomBackground) {
+				case 0:
+					return this.add.image(256, 240, "background").setScale(4);
+				case 1:
+					return this.add.image(256, 240, "background2");
+			}
+		}
+
+		// Add and scale the background
+		const background = getBackgroundImage();
 		// Play background music
 		const backgroundMusic = this.sound.add('background3', {
 			volume: 0.1, // Set volume to a reasonable level
@@ -744,7 +753,7 @@ class MainGame extends Phaser.Scene {
 		}
 
 		function generateMap() {
-			const random_map = Math.floor(Math.random() * 3);			
+			const random_map = Math.floor(Math.random() * 3);
 
 			switch (random_map) {
 				case 0:
@@ -798,7 +807,7 @@ class MainGame extends Phaser.Scene {
 			}
 		}
 		// Generate the map of the tiles
-		generateMap();		
+		generateMap();
 
 		// Lava and traps setup
 		const lava = this.physics.add.staticGroup();
@@ -814,7 +823,7 @@ class MainGame extends Phaser.Scene {
 		player1ManaBar = this.add.graphics({ x: 10, y: 30 });
 		player2HealthBar = this.add.graphics({ x: 400, y: 10 });
 		player2ManaBar = this.add.graphics({ x: 400, y: 30 });
-  
+
 		// Draw initial bars
 		drawHealthBar(player1HealthBar, player1Health);
 		drawManaBar(player1ManaBar, player1Mana);
@@ -940,41 +949,41 @@ function hitLava(player, lava) {
 	}
 }
 
-    function hitTrap(player, trap) {
-        if (!player.trapContact) {
-            player.trapContact = true;
-    
-            // Disable player movement for 1.5 seconds
-            player.setVelocityX(0);
-            player.setVelocityY(0);
-            player.body.moves = false;
-    
-            this.time.delayedCall(1500, () => {
-                player.body.moves = true;
-                player.trapContact = false;
-                console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
-            }, [], this);
-    
-            console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap and is immobilized.`);
-    
-            // Make the trap disappear and respawn after 2 seconds
-            trap.setActive(false).setVisible(false);
-    
-            this.time.delayedCall(2000, () => {
-                respawnTrap(trap, this);
-            }, [], this);
-        }
-    }
-    
-    function respawnTrap(trap, scene) {
-        // Randomly select new position for the trap
-        const newX = Phaser.Math.Between(50, config.width - 50);
-        const newY = Phaser.Math.Between(50, config.height - 150);
-    
-        trap.setPosition(newX, newY);
-        trap.setActive(true).setVisible(true);
-        console.log('Trap has respawned at a new location.');
-    }
+function hitTrap(player, trap) {
+	if (!player.trapContact) {
+		player.trapContact = true;
+
+		// Disable player movement for 1.5 seconds
+		player.setVelocityX(0);
+		player.setVelocityY(0);
+		player.body.moves = false;
+
+		this.time.delayedCall(1500, () => {
+			player.body.moves = true;
+			player.trapContact = false;
+			console.log(`${player === player1 ? 'Player 1' : 'Player 2'} can move again after being immobilized by the trap.`);
+		}, [], this);
+
+		console.log(`${player === player1 ? 'Player 1' : 'Player 2'} hit a trap and is immobilized.`);
+
+		// Make the trap disappear and respawn after 2 seconds
+		trap.setActive(false).setVisible(false);
+
+		this.time.delayedCall(2000, () => {
+			respawnTrap(trap, this);
+		}, [], this);
+	}
+}
+
+function respawnTrap(trap, scene) {
+	// Randomly select new position for the trap
+	const newX = Phaser.Math.Between(50, config.width - 50);
+	const newY = Phaser.Math.Between(50, config.height - 150);
+
+	trap.setPosition(newX, newY);
+	trap.setActive(true).setVisible(true);
+	console.log('Trap has respawned at a new location.');
+}
 
 
 function adjustDirectionBasedOnOpponent(player, opponent) {
@@ -1203,10 +1212,10 @@ function playAnimation(player, action) {
 
 
 function manageAttacks() {
-    if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
-        lastPlayer1AttackTime = this.time.now; // Update last attack time
-        handleAttack.call(this, player1, player2, 'regular');
-    }
+	if (Phaser.Input.Keyboard.JustDown(keys.SPACE) && this.time.now > lastPlayer1AttackTime + attackDelay) {
+		lastPlayer1AttackTime = this.time.now; // Update last attack time
+		handleAttack.call(this, player1, player2, 'regular');
+	}
 
 	if (Phaser.Input.Keyboard.JustDown(keys.S) && this.time.now > lastPlayer1AttackTime + attackDelay) {
 		lastPlayer1AttackTime = this.time.now; // Update last attack time
@@ -1255,8 +1264,8 @@ function handleAttack(attacker, target, type) {
 	const animKey = attacker.texture.key.includes('wolverine') ? 'wolverine' :
 		attacker.texture.key.includes('trunks') ? 'trunks' :
 			attacker.texture.key.includes('sasuke') ? 'sasuke' :
-				attacker.texture.key.includes('batman') ? 'batman' : 
-					attacker.texture.key.includes('terminator') ? 'terminator' : 'vegeta';						
+				attacker.texture.key.includes('batman') ? 'batman' :
+					attacker.texture.key.includes('terminator') ? 'terminator' : 'vegeta';
 
 	const animation = animations[animKey][type];
 	const manaCost = attackCosts[type];
